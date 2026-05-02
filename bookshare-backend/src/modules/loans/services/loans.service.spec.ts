@@ -5,26 +5,14 @@ import { BooksRepository } from '../../books/repositories/books.repository';
 import { UsersRepository } from '../../users/repositories/users.repository';
 import { BookStatus } from '../../../common/enums/book-status.enum';
 import { LoanStatus } from '../../../common/enums/loan-status.enum';
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 
 describe('LoansService', () => {
   let service: LoansService;
-  let loansRepository: LoansRepository;
-  let booksRepository: BooksRepository;
-  let usersRepository: UsersRepository;
-
-  // Criamos versões "falsas" (mocks) dos repositórios
-  const mockLoansRepository = {
-    save: jest.fn(),
-    countActiveLoansByUser: jest.fn(),
-  };
-  const mockBooksRepository = {
-    findById: jest.fn(),
-    updateStatus: jest.fn(),
-  };
-  const mockUsersRepository = {
-    findByIdWithPendingFines: jest.fn(),
-  };
+  
+  const mockLoansRepository = { save: jest.fn(), countActiveLoansByUser: jest.fn() };
+  const mockBooksRepository = { findById: jest.fn(), updateStatus: jest.fn() };
+  const mockUsersRepository = { findByIdWithPendingFines: jest.fn() };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -37,69 +25,60 @@ describe('LoansService', () => {
     }).compile();
 
     service = module.get<LoansService>(LoansService);
-    loansRepository = module.get<LoansRepository>(LoansRepository);
-    booksRepository = module.get<BooksRepository>(BooksRepository);
-    usersRepository = module.get<UsersRepository>(UsersRepository);
+    
+    jest.clearAllMocks();
   });
 
-  it('deve ser definido', () => {
-    expect(service).toBeDefined();
-  });
-
-  describe('create', () => {
-    it('deve criar um empréstimo com sucesso', async () => {
-      // Configuração do Mock (Cenário Perfeito)
-      const mockUser = { id: 'user-1', hasMultasPendentes: false, reputacao: 5.0 };
-      const mockBook = { id: 'book-1', status: BookStatus.DISPONIVEL, donoId: 'outro-user' };
-      
-      mockUsersRepository.findByIdWithPendingFines.mockResolvedValue(mockUser);
+  describe('Use Case: Solicitar Empréstimo (Create)', () => {
+    
+    it('Deve criar um empréstimo com sucesso e mudar o status do livro', async () => {
+      mockUsersRepository.findByIdWithPendingFines.mockResolvedValue({ id: 'user-1', hasMultasPendentes: false, reputacao: 5.0 });
       mockLoansRepository.countActiveLoansByUser.mockResolvedValue(1);
-      mockBooksRepository.findById.mockResolvedValue(mockBook);
-      mockLoansRepository.save.mockImplementation((loan) => Promise.resolve(loan));
+      mockBooksRepository.findById.mockResolvedValue({ id: 'book-1', status: BookStatus.DISPONIVEL, donoId: 'user-2' });
+      mockLoansRepository.save.mockImplementation(loan => Promise.resolve({ ...loan, id: 'loan-123' }));
 
       const result = await service.create({ livroId: 'book-1' }, 'user-1');
 
       expect(result).toBeDefined();
       expect(result.status).toBe(LoanStatus.PENDENTE);
-      expect(mockBooksRepository.updateStatus).toHaveBeenCalledWith('book-1', BookStatus.EMPRESTADO);
+      expect(mockBooksRepository.updateStatus).toHaveBeenCalledWith('book-1', BookStatus.EMPRESTADO); 
     });
 
-    it('deve lançar erro se o utilizador tiver multas pendentes', async () => {
-      mockUsersRepository.findByIdWithPendingFines.mockResolvedValue({
-        id: 'user-1',
-        hasMultasPendentes: true,
-      });
+    // --- 🟡 REGRAS DE NEGÓCIO ---
+    it('Deve falhar se o usuário não for encontrado (Vulnerabilidade de ID falso)', async () => {
+      mockUsersRepository.findByIdWithPendingFines.mockResolvedValue(null);
+
+      await expect(service.create({ livroId: 'book-1' }, 'user-fantasma'))
+        .rejects.toThrow(NotFoundException);
+    });
+
+    it('Deve falhar se a reputação do usuário for menor que 4.0', async () => {
+      mockUsersRepository.findByIdWithPendingFines.mockResolvedValue({ id: 'user-1', hasMultasPendentes: false, reputacao: 3.9 });
 
       await expect(service.create({ livroId: 'book-1' }, 'user-1'))
         .rejects.toThrow(ForbiddenException);
     });
 
-    it('deve lançar erro se o utilizador tentar levantar o próprio livro', async () => {
-      mockUsersRepository.findByIdWithPendingFines.mockResolvedValue({
-        id: 'user-1',
-        hasMultasPendentes: false,
-        reputacao: 5.0
-      });
-      mockBooksRepository.findById.mockResolvedValue({
-        id: 'book-1',
-        status: BookStatus.DISPONIVEL,
-        donoId: 'user-1' // Mesmo ID do solicitante
-      });
+    it('Deve falhar se o livro já estiver emprestado ou indisponível', async () => {
+      mockUsersRepository.findByIdWithPendingFines.mockResolvedValue({ id: 'user-1', hasMultasPendentes: false, reputacao: 5.0 });
+      mockLoansRepository.countActiveLoansByUser.mockResolvedValue(0);
+      mockBooksRepository.findById.mockResolvedValue({ id: 'book-1', status: BookStatus.EMPRESTADO, donoId: 'user-2' });
 
       await expect(service.create({ livroId: 'book-1' }, 'user-1'))
         .rejects.toThrow(BadRequestException);
     });
 
-    it('deve lançar erro se o utilizador já tiver 3 empréstimos ativos', async () => {
-        mockUsersRepository.findByIdWithPendingFines.mockResolvedValue({
-          id: 'user-1',
-          hasMultasPendentes: false,
-          reputacao: 5.0
-        });
-        mockLoansRepository.countActiveLoansByUser.mockResolvedValue(3); // Limite atingido
-  
-        await expect(service.create({ livroId: 'book-1' }, 'user-1'))
-          .rejects.toThrow(BadRequestException);
-      });
+    // --- 🔴 VULNERABILIDADES EXTREMAS ---
+    it('Deve falhar se o sistema tentar salvar o empréstimo, mas o banco de dados cair no meio do processo', async () => {
+      mockUsersRepository.findByIdWithPendingFines.mockResolvedValue({ id: 'user-1', hasMultasPendentes: false, reputacao: 5.0 });
+      mockLoansRepository.countActiveLoansByUser.mockResolvedValue(0);
+      mockBooksRepository.findById.mockResolvedValue({ id: 'book-1', status: BookStatus.DISPONIVEL, donoId: 'user-2' });
+      
+      mockLoansRepository.save.mockRejectedValue(new Error('Database Connection Lost'));
+
+      await expect(service.create({ livroId: 'book-1' }, 'user-1'))
+        .rejects.toThrow('Database Connection Lost');
+      
+    });
   });
 });

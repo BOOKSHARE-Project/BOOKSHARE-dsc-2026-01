@@ -1,22 +1,26 @@
 import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { BooksService } from '../services/books.service';
 import { CreateBookDto } from '../dto/create-book.dto';
+import { CreateBookResponseDto } from '../dto/create-book-response.dto';
 
-@Controller('books') // Endpoint base: http://localhost:3000/books
+@Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
   @Post()
-  async create(@Body() dto: CreateBookDto) {
+  async create(@Body() dto: CreateBookDto): Promise<CreateBookResponseDto> {
     const book = await this.booksService.create(dto);
+    
     return {
-      message: 'Livro cadastrado com sucesso',
-      data: book,
+      bookId: book.id,
+      titulo: book.titulo,
+      status: book.status,
+      message: 'Livro cadastrado com sucesso!'
     };
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async getBook(@Param('id') id: string) {
     const book = await this.booksService.findById(id);
     return { data: book };
   }
