@@ -9,10 +9,9 @@ export class LoansController {
 
   @Post()
   async create(@Body() dto: CreateLoanDto): Promise<CreateLoanResponseDto> {
-    const userId = 'id-do-usuario-logado'; // Simulação por enquanto
+    const userId = 'id-do-usuario-logado';
     const loan = await this.loansService.create(dto, userId);
 
-    // Retornamos exatamente o formato do DTO de Resposta
     return {
       loanId: loan.id,
       livroId: loan.livroId,

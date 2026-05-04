@@ -16,7 +16,6 @@ describe('AppController', () => {
 
   describe('root', () => {
     it('deve retornar a mensagem de boas-vindas do BOOKSHARE', () => {
-      // Aqui nós ajustamos a expectativa do teste para a frase correta
       expect(appController.getHello()).toBe('Bem-vindo à API do sistema BOOKSHARE!');
     });
   });

@@ -11,7 +11,6 @@ export class UsersController {
   async register(@Body() dto: CreateUserDto): Promise<CreateUserResponseDto> {
     const user = await this.usersService.create(dto);
     
-    // Retornando exatamente o formato do DTO de Resposta
     return {
       userId: user.id,
       nome: user.nome,
