@@ -4,7 +4,7 @@ import { BooksModule } from './modules/books/books.module';
 
 @Module({
   imports: [
-    BooksModule, // <-- Registramos o módulo de livros aqui
+    BooksModule,
     LoansModule,
   ],
 })
