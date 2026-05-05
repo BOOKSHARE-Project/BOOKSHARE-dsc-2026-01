@@ -44,7 +44,7 @@ describe('LoansService', () => {
       expect(mockBooksRepository.updateStatus).toHaveBeenCalledWith('book-1', BookStatus.EMPRESTADO); 
     });
 
-    // --- 🟡 REGRAS DE NEGÓCIO ---
+    
     it('Deve falhar se o usuário não for encontrado (Vulnerabilidade de ID falso)', async () => {
       mockUsersRepository.findByIdWithPendingFines.mockResolvedValue(null);
 
@@ -68,7 +68,6 @@ describe('LoansService', () => {
         .rejects.toThrow(BadRequestException);
     });
 
-    // --- 🔴 VULNERABILIDADES EXTREMAS ---
     it('Deve falhar se o sistema tentar salvar o empréstimo, mas o banco de dados cair no meio do processo', async () => {
       mockUsersRepository.findByIdWithPendingFines.mockResolvedValue({ id: 'user-1', hasMultasPendentes: false, reputacao: 5.0 });
       mockLoansRepository.countActiveLoansByUser.mockResolvedValue(0);
