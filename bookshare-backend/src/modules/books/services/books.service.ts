@@ -1,12 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { BooksRepository } from '../repositories/books.repository';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { BOOKS_REPOSITORY, BooksRepository } from '../repositories/books.repository.interface';
 import { CreateBookDto } from '../dto/create-book.dto';
 import { Book } from '../entities/book.entity';
 import { BookStatus } from '../../../common/enums/book-status.enum';
 
 @Injectable()
 export class BooksService {
-  constructor(private readonly booksRepository: BooksRepository) {}
+  constructor(
+    @Inject(BOOKS_REPOSITORY)
+    private readonly booksRepository: BooksRepository,
+  ) {}
 
   async create(dto: CreateBookDto): Promise<Book> {
     const novoLivro = new Book(

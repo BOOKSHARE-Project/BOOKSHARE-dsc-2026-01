@@ -1,0 +1,11 @@
+import { LoanEntity } from '../entities/loan.entity';
+import { LoanStatus } from '../../../common/enums/loan-status.enum';
+
+export const LOANS_REPOSITORY = 'LOANS_REPOSITORY';
+
+export interface LoansRepository {
+  save(loan: Partial<LoanEntity>): Promise<LoanEntity>;
+  findById(id: string): Promise<LoanEntity | null>;
+  countActiveLoansByUser(userId: string): Promise<number>;
+  updateStatus(id: string, status: LoanStatus): Promise<void>;
+}

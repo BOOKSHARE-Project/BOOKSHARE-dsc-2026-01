@@ -1,21 +1,26 @@
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { LoansRepository } from '../repositories/loans.repository';
-import { BooksRepository } from '../../books/repositories/books.repository';
-import { UsersRepository } from '../../users/repositories/users.repository';
+import { Injectable, BadRequestException, NotFoundException, ForbiddenException, Inject } from '@nestjs/common';
+import { LOANS_REPOSITORY, LoansRepository } from '../repositories/loans.repository.interface';
+import { BOOKS_REPOSITORY, BooksRepository } from '../../books/repositories/books.repository.interface';
+import { USERS_REPOSITORY, UsersRepository } from '../../users/repositories/users.repository.interface';
 import { CreateLoanDto } from '../dto/create-loan.dto';
-import { Loan } from '../entities/loan.entity';
+import { LoanEntity } from '../entities/loan.entity';
 import { LoanStatus } from '../../../common/enums/loan-status.enum';
 import { BookStatus } from '../../../common/enums/book-status.enum';
 
 @Injectable()
 export class LoansService {
   constructor(
+    @Inject(LOANS_REPOSITORY)
     private readonly loansRepository: LoansRepository,
+    
+    @Inject(BOOKS_REPOSITORY)
     private readonly booksRepository: BooksRepository,
+    
+    @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  async create(dto: CreateLoanDto, userId: string): Promise<Loan> {
+  async create(dto: CreateLoanDto, userId: string): Promise<LoanEntity> {
     const user = await this.usersRepository.findByIdWithPendingFines(userId);
     if (!user) {
       throw new NotFoundException('Usuário não encontrado.');
@@ -47,14 +52,12 @@ export class LoansService {
       throw new BadRequestException('Você não pode solicitar o empréstimo do seu próprio livro.');
     }
 
-   
-    const novoEmprestimo = new Loan(
-      crypto.randomUUID(),
-      book.id,
-      userId,
-      LoanStatus.PENDENTE,
-      new Date()
-    );
+    const novoEmprestimo = {
+      livroId: book.id,
+      solicitanteId: userId,
+      status: LoanStatus.PENDENTE,
+      dataEmprestimo: new Date(),
+    } as Partial<LoanEntity>;
 
     await this.booksRepository.updateStatus(book.id, BookStatus.EMPRESTADO);
 

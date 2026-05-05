@@ -1,11 +1,14 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
-import { UsersRepository } from '../repositories/users.repository';
+import { Injectable, ConflictException, NotFoundException, Inject } from '@nestjs/common';
+import { USERS_REPOSITORY, UsersRepository } from '../repositories/users.repository.interface';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    @Inject(USERS_REPOSITORY) 
+    private readonly usersRepository: UsersRepository,
+  ) {}
 
   async create(dto: CreateUserDto): Promise<User> {
     const emailExists = await this.usersRepository.findByEmail(dto.email);

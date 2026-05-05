@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: bookshare-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: mrn
+      POSTGRES_PASSWORD: Ping2012
+      POSTGRES_DB: bookshare_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - bookshare_pg_data:/var/lib/postgresql/data
+    networks:
+      - bookshare_network
+
+volumes:
+  bookshare_pg_data:
+
+networks:
+  bookshare_network:
+    driver: bridge
