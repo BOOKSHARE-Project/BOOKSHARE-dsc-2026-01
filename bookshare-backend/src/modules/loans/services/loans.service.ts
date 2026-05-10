@@ -20,12 +20,18 @@ export class LoansService {
     private readonly usersRepository: UsersRepository,
   ) {}
 
+  async findAll(): Promise<LoanEntity[]> {
+    return this.loansRepository.findAll();
+  }
+
   async create(dto: CreateLoanDto, userId: string): Promise<LoanEntity> {
+    // 1. Validação do Usuário
     const user = await this.usersRepository.findByIdWithPendingFines(userId);
     if (!user) {
       throw new NotFoundException('Usuário não encontrado.');
     }
 
+    // 2. Validação de Regras de Negócio do Usuário
     if (user.hasMultasPendentes) {
       throw new ForbiddenException('Usuário possui multas pendentes.');
     }
@@ -34,33 +40,40 @@ export class LoansService {
       throw new ForbiddenException('Reputação insuficiente para realizar empréstimos.');
     }
 
+    // 3. Validação de Limite de Empréstimos Ativos
     const activeLoansCount = await this.loansRepository.countActiveLoansByUser(userId);
     if (activeLoansCount >= 3) {
       throw new BadRequestException('Usuário já possui o limite de 3 empréstimos ativos.');
     }
 
+    // 4. Validação do Livro
     const book = await this.booksRepository.findById(dto.livroId);
     if (!book) {
       throw new NotFoundException('Livro não encontrado.');
     }
 
+    // 5. Validação de Status do Livro
     if (book.status !== BookStatus.DISPONIVEL) {
       throw new BadRequestException('O livro não está disponível para empréstimo.');
     }
 
+    // 6. Impedir que o dono pegue o próprio livro
     if (book.donoId === userId) {
       throw new BadRequestException('Você não pode solicitar o empréstimo do seu próprio livro.');
     }
 
-    const novoEmprestimo = {
-      livroId: book.id,
-      solicitanteId: userId,
+    // 7. Preparação dos dados para salvar
+    const loanData: Partial<LoanEntity> = {
+      bookId: book.id,
+      requesterId: userId,
       status: LoanStatus.PENDENTE,
-      dataEmprestimo: new Date(),
-    } as Partial<LoanEntity>;
+      // Se quiser data de retorno: dataRetornoPrevista: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    };
 
+    // 8. Atualizar status do livro para EMPRESTADO
     await this.booksRepository.updateStatus(book.id, BookStatus.EMPRESTADO);
 
-    return this.loansRepository.save(novoEmprestimo);
+    // 9. Salvar e retornar o empréstimo criado
+    return this.loansRepository.save(loanData as LoanEntity);
   }
 }

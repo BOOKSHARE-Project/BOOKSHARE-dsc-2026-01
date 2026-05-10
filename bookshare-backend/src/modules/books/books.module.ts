@@ -19,6 +19,5 @@ import { BOOKS_REPOSITORY } from './repositories/books.repository.interface';
       useClass: BooksTypeOrmRepository,
     },
   ],
-  exports: [BooksRepository, BooksService],
-})
+exports: [BOOKS_REPOSITORY, BooksService],})
 export class BooksModule {}

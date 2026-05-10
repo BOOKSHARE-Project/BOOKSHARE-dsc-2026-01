@@ -4,7 +4,7 @@ import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedCol
 @Entity('loans')
 export class LoanEntity {
     @PrimaryGeneratedColumn('uuid', { name: 'loan_id' })
-    loanId: string;
+    id: string; 
 
     @Column({ name: 'livro_id', type: 'uuid' })
     bookId: string;
@@ -22,20 +22,12 @@ export class LoanEntity {
     @Column({ name: 'data_retorno_prevista', type: 'timestamp', nullable: true })
     dataRetornoPrevista: Date;
 
-    @CreateDateColumn({ name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
+    @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 
-    @UpdateDateColumn({ name: 'updated_at', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
 
-    @DeleteDateColumn({ name: 'deleted_at' })
+    @DeleteDateColumn({ name: 'deleted_at', nullable: true })
     deletedAt: Date | null;
-}
-export class Loan {
-  constructor(
-    public id: string,
-    public livroId: string,
-    public solicitanteId: string,
-    public status: LoanStatus,
-    public dataSolicitacao: Date,  ) {}
 }

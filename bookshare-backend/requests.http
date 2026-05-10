@@ -1,0 +1,117 @@
+### ==========================================
+### 1. SETUP INICIAL (Rodar sempre primeiro)
+# @name dono
+POST http://localhost:3002/users
+Content-Type: application/json
+
+{ "nome": "Dono", "email": "dono@teste.com", "senha": "senhaSegura123" }
+
+###
+# @name leitor1
+POST http://localhost:3002/users
+Content-Type: application/json
+
+{ "nome": "Leitor 1", "email": "leitor1@teste.com", "senha": "senhaSegura123" }
+
+###
+# @name leitor2
+POST http://localhost:3002/users
+Content-Type: application/json
+
+{ "nome": "Leitor 2", "email": "leitor2@teste.com", "senha": "senhaSegura123" }
+
+###
+# @name livro
+POST http://localhost:3002/books
+Content-Type: application/json
+
+{ "titulo": "Clean Code", "autor": "Uncle Bob", "isbn": "111", "donoId": "{{dono.response.body.id}}" }
+
+### ==========================================
+### TESTE A: EMPRÉSTIMO COM SUCESSO
+# O Leitor 1 pega o livro. Deve retornar 201.
+# @name emprestimo_sucesso
+POST http://localhost:3002/loans/{{leitor1.response.body.id}}
+Content-Type: application/json
+
+{ "livroId": "{{livro.response.body.id}}" }
+
+
+### ==========================================
+### TESTE B: LIVRO JÁ EMPRESTADO (ERRO 400)
+POST http://localhost:3002/loans/{{leitor2.response.body.id}}
+Content-Type: application/json
+
+{ "livroId": "{{livro.response.body.id}}" }
+
+
+### ==========================================
+### TESTE C: DONO TENTA PEGAR O PRÓPRIO LIVRO (ERRO 400)
+# @name livro_do_dono
+POST http://localhost:3002/books
+Content-Type: application/json
+
+{ "titulo": "Meu Livro", "autor": "Eu", "isbn": "222", "donoId": "{{dono.response.body.id}}" }
+
+### Tentativa de auto-empréstimo:
+POST http://localhost:3002/loans/{{dono.response.body.id}}
+Content-Type: application/json
+
+{ "livroId": "{{livro_do_dono.response.body.id}}" }
+
+
+### ==========================================
+### TESTE D: LIMITE DE EMPRÉSTIMOS (ERRO 400)
+
+# @name l1
+POST http://localhost:3002/books
+Content-Type: application/json
+
+{ "titulo": "Livro 1", "autor": "A", "isbn": "1", "donoId": "{{dono.response.body.id}}" }
+
+###
+# @name l2
+POST http://localhost:3002/books
+Content-Type: application/json
+
+{ "titulo": "Livro 2", "autor": "B", "isbn": "2", "donoId": "{{dono.response.body.id}}" }
+
+###
+# @name l3
+POST http://localhost:3002/books
+Content-Type: application/json
+
+{ "titulo": "Livro 3", "autor": "C", "isbn": "3", "donoId": "{{dono.response.body.id}}" }
+
+###
+# @name l4
+POST http://localhost:3002/books
+Content-Type: application/json
+
+{ "titulo": "Livro 4", "autor": "D", "isbn": "4", "donoId": "{{dono.response.body.id}}" }
+
+### Realizar 3 empréstimos para Leitor 2 (Sucesso)
+POST http://localhost:3002/loans/{{leitor2.response.body.id}}
+Content-Type: application/json
+
+{ "livroId": "{{l1.response.body.id}}" }
+
+###
+POST http://localhost:3002/loans/{{leitor2.response.body.id}}
+Content-Type: application/json
+
+{ "livroId": "{{l2.response.body.id}}" }
+
+###
+POST http://localhost:3002/loans/{{leitor2.response.body.id}}
+Content-Type: application/json
+
+{ "livroId": "{{l3.response.body.id}}" }
+
+### Tentativa do 4º empréstimo (Falha)
+# Esperado: "Usuário já possui o limite de 3 empréstimos ativos."
+POST http://localhost:3002/loans/{{leitor2.response.body.id}}
+Content-Type: application/json
+
+
+{ "livroId": "{{l4.response.body.id}}" }

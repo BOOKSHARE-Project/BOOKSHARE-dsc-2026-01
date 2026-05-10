@@ -23,6 +23,6 @@ import { LOANS_REPOSITORY } from './repositories/loans.repository.interface';
       useClass: LoansTypeOrmRepository,
     },
   ],
-  exports: [LoansRepository, LoansService],
+  exports: [LOANS_REPOSITORY, LoansService],
 })
 export class LoansModule {}

@@ -1,6 +1,12 @@
-import { Loan } from '../entities/loan.entity';
+import { LoanEntity } from '../entities/loan.entity';
+import { LoanStatus } from '../../../common/enums/loan-status.enum';
 
-export abstract class LoansRepository {
-  abstract countActiveLoansByUser(userId: string): Promise<number>;
-  abstract save(loan: Loan): Promise<Loan>;
+export interface LoansRepository {
+  save(loanData: Partial<LoanEntity>): Promise<LoanEntity>;
+  findById(id: string): Promise<LoanEntity | null>;
+  countActiveLoansByUser(userId: string): Promise<number>;
+  updateStatus(id: string, status: LoanStatus): Promise<void>;
+  findAll(): Promise<LoanEntity[]>;
 }
+
+export const LOANS_REPOSITORY = 'LoansRepository';

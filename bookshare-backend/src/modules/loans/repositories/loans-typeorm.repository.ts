@@ -12,13 +12,17 @@ export class LoansTypeOrmRepository implements LoansRepository {
     private readonly typeOrmRepo: Repository<LoanEntity>,
   ) {}
 
-  async save(loanData: any): Promise<any> {
+  async findAll(): Promise<LoanEntity[]> {
+  return await this.typeOrmRepo.find();
+  }
+
+  async save(loanData: Partial<LoanEntity>): Promise<LoanEntity> {
     const loan = this.typeOrmRepo.create(loanData);
     return await this.typeOrmRepo.save(loan);
   }
 
-  async findById(id: string): Promise<any | null> {
-    return await this.typeOrmRepo.findOne({ where: { loanId: id } });
+  async findById(id: string): Promise<LoanEntity | null> {
+    return await this.typeOrmRepo.findOne({ where: { id: id } });
   }
 
   async countActiveLoansByUser(userId: string): Promise<number> {

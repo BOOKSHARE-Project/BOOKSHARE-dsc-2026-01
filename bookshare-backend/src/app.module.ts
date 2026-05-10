@@ -27,6 +27,7 @@ import { LoansModule } from './modules/loans/loans.module';
         database: configService.get<string>('DB_DATABASE'),
         entities: [UserEntity, BookEntity, LoanEntity],
         synchronize: true,
+        dropSchema: true,
       }),
     }),
   ],

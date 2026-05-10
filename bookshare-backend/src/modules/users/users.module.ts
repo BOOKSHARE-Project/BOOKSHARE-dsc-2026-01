@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { UsersService } from './services/users.service';
 import { UsersController } from './controllers/users.controller';
-import { UsersRepository } from './repositories/users.repository';
 import { UsersTypeOrmRepository } from './repositories/users-typeorm.repository';
 import { USERS_REPOSITORY } from './repositories/users.repository.interface';
 
@@ -16,9 +15,9 @@ import { USERS_REPOSITORY } from './repositories/users.repository.interface';
     UsersService,
     {
       provide: USERS_REPOSITORY, 
-    useClass: UsersTypeOrmRepository, 
+      useClass: UsersTypeOrmRepository, 
     },
   ],
-  exports: [UsersRepository, UsersService],
+  exports: [USERS_REPOSITORY, UsersService], 
 })
 export class UsersModule {}

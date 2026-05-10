@@ -9,9 +9,9 @@ export class CreateBookDto {
   @IsString()
   autor!: string;
 
-  @IsNotEmpty({ message: 'O ISBN é obrigatório.' })
-  @IsISBN(10, { message: 'Forneça um ISBN válido.' })
-  isbn!: string;
+  @IsString({ message: 'O ISBN deve ser um texto' })
+  @IsNotEmpty({ message: 'O ISBN é obrigatório' })
+  isbn: string;
 
   
   @IsNotEmpty({ message: 'O ID do dono é obrigatório.' })
