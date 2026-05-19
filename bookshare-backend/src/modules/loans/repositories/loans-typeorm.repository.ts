@@ -1,16 +1,17 @@
-import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import type { Repository } from 'typeorm';
 import { LoansRepository } from './loans.repository';
 import { LoanEntity } from '../entities/loan.entity';
 import { LoanStatus } from '../../../common/enums/loan-status.enum';
 
-@Injectable()
 export class LoansTypeOrmRepository implements LoansRepository {
   constructor(
     @InjectRepository(LoanEntity)
     private readonly typeOrmRepo: Repository<LoanEntity>,
   ) {}
+  findByIdWithBook(id: string): Promise<LoanEntity | null> {
+    throw new Error('Method not implemented.');
+  }
 
   async findAll(): Promise<LoanEntity[]> {
   return await this.typeOrmRepo.find();
