@@ -1,6 +1,7 @@
 # Evidências da Implementação FASE RED - UC03-1
 
 
+
 ## Testes 
 
 Comando utilizado: 
@@ -68,6 +69,7 @@ https://github.com/BOOKSHARE-Project/BOOKSHARE-dsc-2026-01/pull/18
 
 
 # Evidências da Implementação Do Repositorio - UC03-2
+# Evidências da Implementação Do Repositorio
 
 **Isolamento da Camada de Dados**: Foi adicionada a função `registerReturnTransaction` na interface e na implementação do repositório de empréstimos (`LoansTypeOrmRepository`).
 - **Transação Atômica**: Utilização do `QueryRunner` do TypeORM para garantir que todas as atualizações no banco de dados sejam feitas de forma segura e conjunta.
