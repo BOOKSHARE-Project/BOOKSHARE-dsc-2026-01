@@ -76,4 +76,64 @@ export class LoansService {
     // 9. Salvar e retornar o empréstimo criado
     return this.loansRepository.save(loanData as LoanEntity);
   }
+
+  async returnLoan(loanId: string, userId: string) {
+    // 1. Validar se o empréstimo existe
+    const loan = await this.loansRepository.findById(loanId);
+    if (!loan) {
+      throw new NotFoundException('Empréstimo não encontrado.');
+    }
+
+    // 2. Validar se o empréstimo está ATIVO
+    if (loan.status !== LoanStatus.ATIVO) {
+      throw new BadRequestException('O empréstimo não está ativo para ser devolvido.');
+    }
+
+    // 3. Validar se o userId é o dono do livro (RN02)
+    const book = await this.booksRepository.findById(loan.bookId);
+    if (!book) {
+      throw new NotFoundException('Livro não encontrado.');
+    }
+    
+    if (book.donoId !== userId) {
+      throw new ForbiddenException('Usuário não é dono do livro.');
+    }
+
+    // 4. Lógica de atraso (RN05 e RN06)
+    let newReputation: number | undefined = undefined;
+    
+    if (loan.dataRetornoPrevista) {
+      const now = new Date();
+      if (now > loan.dataRetornoPrevista) {
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const diffMs = now.getTime() - loan.dataRetornoPrevista.getTime();
+        const daysDelayed = Math.ceil(diffMs / msPerDay);
+
+        if (daysDelayed > 0) {
+          const requester = await this.usersRepository.findById(loan.requesterId);
+          if (requester) {
+            newReputation = requester.reputacao - (0.5 * daysDelayed);
+            // Evitar pontuação negativa
+            if (newReputation < 0) newReputation = 0;
+          }
+        }
+      }
+    }
+
+    // 5. Chamar a transação atômica do repositório
+    await this.loansRepository.registerReturnTransaction(
+      loan.id,
+      book.id,
+      loan.requesterId,
+      newReputation
+    );
+
+    // 6. Retornar dados atualizados (sem depender de HTTP)
+    return {
+      loanId: loan.id,
+      statusEmprestimo: LoanStatus.DEVOLVIDO,
+      statusLivro: BookStatus.DISPONIVEL,
+      reputacaoAtualizada: newReputation
+    };
+  }
 }

@@ -1,4 +1,4 @@
-# Evidências da Implementação FASE RED
+# Evidências da Implementação FASE RED - UC03-1
 
 
 ## Testes 
@@ -67,7 +67,7 @@ https://github.com/BOOKSHARE-Project/BOOKSHARE-dsc-2026-01/pull/18
 
 
 
-# Evidências da Implementação Do Repositorio
+# Evidências da Implementação Do Repositorio - UC03-2
 
 **Isolamento da Camada de Dados**: Foi adicionada a função `registerReturnTransaction` na interface e na implementação do repositório de empréstimos (`LoansTypeOrmRepository`).
 - **Transação Atômica**: Utilização do `QueryRunner` do TypeORM para garantir que todas as atualizações no banco de dados sejam feitas de forma segura e conjunta.
@@ -76,3 +76,13 @@ https://github.com/BOOKSHARE-Project/BOOKSHARE-dsc-2026-01/pull/18
 
 ## Link do PR
 
+https://github.com/BOOKSHARE-Project/BOOKSHARE-dsc-2026-01/pull/19
+
+
+# Evidências da Implementação Do Service - UC03-3
+
+- **Criação do Método `returnLoan`**: Implementada a lógica principal de devolução, recebendo apenas `loanId` e `userId`.
+- **Validações de Regra de Negócio (RN02)**: Verifica se o empréstimo existe e está `ATIVO`. Também valida rigorosamente se o usuário que solicita a devolução é o dono legítimo do livro.
+- **Lógica de Atraso (RN05 e RN06)**: Compara a data de hoje com a `dataRetornoPrevista`. Se atrasar, é deduzido `0.5` da reputação do solicitante por dia, garantindo que a nota nunca seja menor que zero.
+- **Integração Atômica**: Aciona o método `registerReturnTransaction` do Repositório.
+- **Isolamento HTTP Respeitado**: O método não depende e não retorna entidades HTTP (Request/Response). Apenas entrega as chaves atualizadas, cumprindo a Regra Estrita.
