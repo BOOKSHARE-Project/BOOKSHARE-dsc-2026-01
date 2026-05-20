@@ -86,6 +86,21 @@ Backend estruturado em camadas seguindo princípios de Clean Architecture e SOLI
 * **Banco de Dados (Previsto):** PostgreSQL
 * **Containerização (Prevista):** Docker & Docker Compose
 
+## ▶️ Como Rodar e Testar
+
+1. **Inicie o Servidor Backend**
+   Navegue até a pasta `bookshare-backend` e inicie a API no modo de desenvolvimento. Isso fará com que o banco de dados seja criado e populado automaticamente através do `SeedService`.
+   ```bash
+   cd bookshare-backend
+   pnpm start:dev
+   ```
+
+2. **Teste os Endpoints (UC03 - Devolução)**
+   Abra o arquivo `tests/api/uc03-return.http` utilizando a extensão **REST Client** no seu editor (ex: VS Code).
+   Certifique-se de que o servidor terminou de iniciar e que você visualizou a mensagem `✅ Seed automático executado com sucesso para os testes TDD.` no terminal.
+   
+   Clique em `Send Request` nos diferentes cenários montados para validar o comportamento da aplicação (Sucesso, 404 e 403).
+
 ---
 
 ## 👤 Autor

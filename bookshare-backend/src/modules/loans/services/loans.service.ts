@@ -12,13 +12,13 @@ export class LoansService {
   constructor(
     @Inject(LOANS_REPOSITORY)
     private readonly loansRepository: LoansRepository,
-    
+
     @Inject(BOOKS_REPOSITORY)
     private readonly booksRepository: BooksRepository,
-    
+
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepository,
-  ) {}
+  ) { }
 
   async findAll(): Promise<LoanEntity[]> {
     return this.loansRepository.findAll();
@@ -94,25 +94,25 @@ export class LoansService {
     if (!book) {
       throw new NotFoundException('Livro não encontrado.');
     }
-    
+
     if (book.donoId !== userId) {
       throw new ForbiddenException('Usuário não é dono do livro.');
     }
 
     // 4. Lógica de atraso (RN05 e RN06)
     let newReputation: number | undefined = undefined;
-    
+
     if (loan.dataRetornoPrevista) {
-      const now = new Date();
-      if (now > loan.dataRetornoPrevista) {
-        const msPerDay = 1000 * 60 * 60 * 24;
-        const diffMs = now.getTime() - loan.dataRetornoPrevista.getTime();
-        const daysDelayed = Math.ceil(diffMs / msPerDay);
+      const currentDate = new Date();
+      if (currentDate > loan.dataRetornoPrevista) {
+        const MILLISECONDS_IN_A_DAY = 1000 * 60 * 60 * 24;
+        const delayInMilliseconds = currentDate.getTime() - loan.dataRetornoPrevista.getTime();
+        const daysDelayed = Math.ceil(delayInMilliseconds / MILLISECONDS_IN_A_DAY);
 
         if (daysDelayed > 0) {
-          const requester = await this.usersRepository.findById(loan.requesterId);
-          if (requester) {
-            newReputation = requester.reputacao - (0.5 * daysDelayed);
+          const borrower = await this.usersRepository.findById(loan.requesterId);
+          if (borrower) {
+            newReputation = borrower.reputacao - (0.5 * daysDelayed);
             // Evitar pontuação negativa
             if (newReputation < 0) newReputation = 0;
           }
