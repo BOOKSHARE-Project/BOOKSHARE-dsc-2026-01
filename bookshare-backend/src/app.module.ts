@@ -22,7 +22,7 @@ import { LoansModule } from './modules/loans/loans.module';
         type: 'postgres',
         host: configService.get<string>('DB_HOST'),
         port: Number(configService.get<string>('DB_PORT')),
-        username: configService.get<string>('DB_USERNAME'),
+        username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
         entities: [UserEntity, BookEntity, LoanEntity],
