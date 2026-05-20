@@ -1,7 +1,5 @@
 # Evidências da Implementação FASE RED - UC03-1
 
-
-
 ## Testes 
 
 Comando utilizado: 
@@ -88,3 +86,68 @@ https://github.com/BOOKSHARE-Project/BOOKSHARE-dsc-2026-01/pull/19
 - **Lógica de Atraso (RN05 e RN06)**: Compara a data de hoje com a `dataRetornoPrevista`. Se atrasar, é deduzido `0.5` da reputação do solicitante por dia, garantindo que a nota nunca seja menor que zero.
 - **Integração Atômica**: Aciona o método `registerReturnTransaction` do Repositório.
 - **Isolamento HTTP Respeitado**: O método não depende e não retorna entidades HTTP (Request/Response). Apenas entrega as chaves atualizadas, cumprindo a Regra Estrita.
+
+
+# Evidências da Implementação FASE GREEN - UC03-4
+
+## Testes 
+
+Comando utilizado: 
+
+pnpm start:dev
+
+## Resultado (GREEN)
+
+O teste 1 deve retornar OK, e os demais o determminado erro
+
+## REGISTROS
+
+### PUT {{baseUrl}}/loans/1/return
+
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 107
+ETag: W/"6b-zWHrMoHC8Nr1xewqteWU5R8Dhv4"
+Date: Wed, 20 May 2026 17:19:48 GMT
+Connection: close
+
+{
+  "loanId": "11111111-1111-1111-1111-111111111111",
+  "statusEmprestimo": "DEVOLVIDO",
+  "statusLivro": "DISPONIVEL"
+}
+
+### PUT {{baseUrl}}/loans99999999-9999-9999-9999-999999999999/return
+
+HTTP/1.1 404 Not Found
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 79
+ETag: W/"4f-/VFUloiOwRVesBFat0Xtj0h7fhU"
+Date: Wed, 20 May 2026 17:20:06 GMT
+Connection: close
+
+{
+  "message": "Empréstimo não encontrado.",
+  "error": "Not Found",
+  "statusCode": 404
+}
+
+### PUT {{baseUrl}}/loans22222222-2222-2222-2222-222222222222/return
+
+HTTP/1.1 403 Forbidden
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 82
+ETag: W/"52-wjTpm2CqQ9n/zSFAvenz7et8LKk"
+Date: Wed, 20 May 2026 17:20:54 GMT
+Connection: close
+
+{
+  "message": "Usuário não é dono do livro.",
+  "error": "Forbidden",
+  "statusCode": 403
+}
+
+## Link do PR
