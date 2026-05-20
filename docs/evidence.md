@@ -61,3 +61,13 @@ Connection: close
 }
 
 
+### Link Do PR
+
+https://github.com/BOOKSHARE-Project/BOOKSHARE-dsc-2026-01/pull/18
+
+# Evidências da Implementação Do Repositorio
+
+- **Isolamento da Camada de Dados**: Foi adicionada a função `registerReturnTransaction` na interface e na implementação do repositório de empréstimos (`LoansTypeOrmRepository`).
+- **Transação Atômica**: Utilização do `QueryRunner` do TypeORM para garantir que todas as atualizações no banco de dados sejam feitas de forma segura e conjunta.
+- **Tabelas Afetadas**: A função atualiza atomicamente o status do Empréstimo para `DEVOLVIDO`, o status do Livro para `DISPONIVEL` e, opcionalmente, atualiza a pontuação (`reputacao`) do Usuário se houver atraso.
+- **Regras Respeitadas**: Toda regra de cálculo de dias ou validação HTTP ficou de fora, focando 100% na persistência atômica.
