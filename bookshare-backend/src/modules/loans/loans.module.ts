@@ -10,11 +10,7 @@ import { BooksModule } from '../books/books.module';
 import { LOANS_REPOSITORY } from './repositories/loans.repository.interface';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([LoanEntity]),
-    UsersModule, 
-    BooksModule, 
-  ],
+  imports: [TypeOrmModule.forFeature([LoanEntity]), UsersModule, BooksModule],
   controllers: [LoansController],
   providers: [
     LoansService,

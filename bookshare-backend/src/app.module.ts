@@ -36,4 +36,4 @@ import { SeedService } from './seed.service';
   controllers: [AppController],
   providers: [AppService, SeedService],
 })
-export class AppModule { }
+export class AppModule {}

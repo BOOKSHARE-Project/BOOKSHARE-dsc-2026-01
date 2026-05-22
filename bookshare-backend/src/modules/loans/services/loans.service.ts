@@ -1,7 +1,22 @@
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException, Inject } from '@nestjs/common';
-import { LOANS_REPOSITORY, LoansRepository } from '../repositories/loans.repository.interface';
-import { BOOKS_REPOSITORY, BooksRepository } from '../../books/repositories/books.repository.interface';
-import { USERS_REPOSITORY, UsersRepository } from '../../users/repositories/users.repository.interface';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+  Inject,
+} from '@nestjs/common';
+import {
+  LOANS_REPOSITORY,
+  LoansRepository,
+} from '../repositories/loans.repository.interface';
+import {
+  BOOKS_REPOSITORY,
+  BooksRepository,
+} from '../../books/repositories/books.repository.interface';
+import {
+  USERS_REPOSITORY,
+  UsersRepository,
+} from '../../users/repositories/users.repository.interface';
 import { CreateLoanDto } from '../dto/create-loan.dto';
 import { LoanEntity } from '../entities/loan.entity';
 import { LoanStatus } from '../../../common/enums/loan-status.enum';
@@ -18,7 +33,7 @@ export class LoansService {
 
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepository,
-  ) { }
+  ) {}
 
   async findAll(): Promise<LoanEntity[]> {
     return this.loansRepository.findAll();
@@ -37,13 +52,18 @@ export class LoansService {
     }
 
     if (user.reputacao < 4.0) {
-      throw new ForbiddenException('Reputação insuficiente para realizar empréstimos.');
+      throw new ForbiddenException(
+        'Reputação insuficiente para realizar empréstimos.',
+      );
     }
 
     // 3. Validação de Limite de Empréstimos Ativos
-    const activeLoansCount = await this.loansRepository.countActiveLoansByUser(userId);
+    const activeLoansCount =
+      await this.loansRepository.countActiveLoansByUser(userId);
     if (activeLoansCount >= 3) {
-      throw new BadRequestException('Usuário já possui o limite de 3 empréstimos ativos.');
+      throw new BadRequestException(
+        'Usuário já possui o limite de 3 empréstimos ativos.',
+      );
     }
 
     // 4. Validação do Livro
@@ -54,12 +74,16 @@ export class LoansService {
 
     // 5. Validação de Status do Livro
     if (book.status !== BookStatus.DISPONIVEL) {
-      throw new BadRequestException('O livro não está disponível para empréstimo.');
+      throw new BadRequestException(
+        'O livro não está disponível para empréstimo.',
+      );
     }
 
     // 6. Impedir que o dono pegue o próprio livro
     if (book.donoId === userId) {
-      throw new BadRequestException('Você não pode solicitar o empréstimo do seu próprio livro.');
+      throw new BadRequestException(
+        'Você não pode solicitar o empréstimo do seu próprio livro.',
+      );
     }
 
     // 7. Preparação dos dados para salvar
@@ -74,7 +98,7 @@ export class LoansService {
     await this.booksRepository.updateStatus(book.id, BookStatus.EMPRESTADO);
 
     // 9. Salvar e retornar o empréstimo criado
-    return this.loansRepository.save(loanData as LoanEntity);
+    return this.loansRepository.save(loanData);
   }
 
   async returnLoan(loanId: string, userId: string) {
@@ -86,7 +110,9 @@ export class LoansService {
 
     // 2. Validar se o empréstimo está ATIVO
     if (loan.status !== LoanStatus.ATIVO) {
-      throw new BadRequestException('O empréstimo não está ativo para ser devolvido.');
+      throw new BadRequestException(
+        'O empréstimo não está ativo para ser devolvido.',
+      );
     }
 
     // 3. Validar se o userId é o dono do livro (RN02)
@@ -106,13 +132,18 @@ export class LoansService {
       const currentDate = new Date();
       if (currentDate > loan.dataRetornoPrevista) {
         const MILLISECONDS_IN_A_DAY = 1000 * 60 * 60 * 24;
-        const delayInMilliseconds = currentDate.getTime() - loan.dataRetornoPrevista.getTime();
-        const daysDelayed = Math.ceil(delayInMilliseconds / MILLISECONDS_IN_A_DAY);
+        const delayInMilliseconds =
+          currentDate.getTime() - loan.dataRetornoPrevista.getTime();
+        const daysDelayed = Math.ceil(
+          delayInMilliseconds / MILLISECONDS_IN_A_DAY,
+        );
 
         if (daysDelayed > 0) {
-          const borrower = await this.usersRepository.findById(loan.requesterId);
+          const borrower = await this.usersRepository.findById(
+            loan.requesterId,
+          );
           if (borrower) {
-            newReputation = borrower.reputacao - (0.5 * daysDelayed);
+            newReputation = borrower.reputacao - 0.5 * daysDelayed;
             // Evitar pontuação negativa
             if (newReputation < 0) newReputation = 0;
           }
@@ -125,7 +156,7 @@ export class LoansService {
       loan.id,
       book.id,
       loan.requesterId,
-      newReputation
+      newReputation,
     );
 
     // 6. Retornar dados atualizados (sem depender de HTTP)
@@ -133,7 +164,7 @@ export class LoansService {
       loanId: loan.id,
       statusEmprestimo: LoanStatus.DEVOLVIDO,
       statusLivro: BookStatus.DISPONIVEL,
-      reputacaoAtualizada: newReputation
+      reputacaoAtualizada: newReputation,
     };
   }
 }

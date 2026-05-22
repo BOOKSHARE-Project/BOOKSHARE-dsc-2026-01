@@ -2,7 +2,9 @@ import { BadRequestException } from '@nestjs/common';
 
 export class UserLowReputationException extends BadRequestException {
   constructor() {
-    super('Usuário não possui a reputação mínima de 4.0 para solicitar empréstimos.');
+    super(
+      'Usuário não possui a reputação mínima de 4.0 para solicitar empréstimos.',
+    );
   }
 }
 
@@ -20,7 +22,9 @@ export class OwnBookLoanException extends BadRequestException {
 
 export class UserHasPendingFinesException extends BadRequestException {
   constructor() {
-    super('Usuário possui multas pendentes e não pode realizar novos empréstimos.');
+    super(
+      'Usuário possui multas pendentes e não pode realizar novos empréstimos.',
+    );
   }
 }
 

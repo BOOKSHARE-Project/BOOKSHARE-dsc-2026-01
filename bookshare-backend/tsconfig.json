@@ -19,9 +19,9 @@
     "noFallthroughCasesInSwitch": false,
     "rootDir": "./",
     "ignoreDeprecations": "6.0",
+    "types": ["node", "jest"]
   },
   "include": [
-    "src/**/*",
-    "test/**/*"
+    "src/**/*"
   ]
 }
