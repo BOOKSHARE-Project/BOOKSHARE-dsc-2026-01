@@ -20,4 +20,4 @@ A implementação do **UC03 (Registrar Devolução de Livro)** foi projetada seg
    - **Transação Atômica**: Foi implementado o método `registerReturnTransaction` utilizando o `QueryRunner` do TypeORM para garantir que a atualização das tabelas `loans`, `books` e `users` aconteça de maneira atômica (Rollback em caso de erro no meio do processo).
 
 ## Solução de Seed para Testes
-Para permitir uma validação perfeita da "Fase GREEN" em um banco configurado com `dropSchema: true` e uso de tipos `UUID` nativos no PostgreSQL, foi implementado um `SeedService` responsável por injetar dados de teste válidos toda vez que o servidor for iniciado (`onModuleInit`).
+Para permitir uma validação perfeita das rotas HTTP em um banco configurado com `dropSchema: true` e uso de tipos `UUID` nativos no PostgreSQL, foi implementado um `SeedService` responsável por injetar dados de teste válidos toda vez que o servidor for iniciado (`onModuleInit`).

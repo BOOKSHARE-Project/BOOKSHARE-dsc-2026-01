@@ -1,11 +1,20 @@
-import { Controller, Post, Body, Param, ParseUUIDPipe, Get, Put, Headers } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  ParseUUIDPipe,
+  Get,
+  Put,
+  Headers,
+} from '@nestjs/common';
 import { LoansService } from '../services/loans.service';
 import { CreateLoanDto } from '../dto/create-loan.dto';
 import { LoanEntity } from '../entities/loan.entity';
 
 @Controller('loans')
 export class LoansController {
-  constructor(private readonly loansService: LoansService) { }
+  constructor(private readonly loansService: LoansService) {}
 
   @Post(':userId')
   async createLoan(
@@ -28,10 +37,10 @@ export class LoansController {
     // Extrai o ID do usuário simulando o token JWT
     // (Como não há JwtAuthGuard configurado, extraímos o token manualmente do Header)
     const token = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
-    
-    // Na falta de um decode real, usamos o token como userId. 
+
+    // Na falta de um decode real, usamos o token como userId.
     // Em produção, isso viria de request.user populado por um Guard.
-    const userId = token; 
+    const userId = token;
 
     // Repassa os dados para o Service, sem regra de negócio no Controller (Regra Estrita)
     return this.loansService.returnLoan(loanId, userId);

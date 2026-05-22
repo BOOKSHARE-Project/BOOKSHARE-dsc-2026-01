@@ -1,114 +1,378 @@
 # 📚 BOOKSHARE
 
-Plataforma de compartilhamento de livros entre usuários, permitindo empréstimos controlados, avaliações e gestão de reputação.
+Plataforma de compartilhamento de livros físicos entre usuários, promovendo acesso ao conhecimento, redução de custos e controle de reputação no ecossistema de empréstimos.
+
+---
+
+<div align="left">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build Status" />
+  <img src="https://img.shields.io/badge/node-%3E%3D%2018-blue.svg" alt="Node Version" />
+  <img src="https://img.shields.io/badge/NestJS-v11-red.svg" alt="NestJS Version" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License" />
+  <img src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg" alt="Prettier Code Style" />
+</div>
 
 ---
 
 ## 🎯 Objetivo
 
-Facilitar o compartilhamento de livros físicos entre usuários, promovendo acesso ao conhecimento e reduzindo custos.
+Facilitar o compartilhamento de livros físicos de forma segura e controlada entre usuários, através de regras estritas de elegibilidade, cálculo automático de penalidades por atraso na devolução e um sistema de reputação dinâmico.
 
 ---
 
 ## 🚀 Funcionalidades
 
-* Cadastro de usuários
-* Autenticação
-* Cadastro de livros
-* Busca de livros disponíveis
-* Solicitação de empréstimos
-* Aprovação de empréstimos
-* Registro de devolução com cálculo de atrasos
-* Avaliação entre usuários e sistema de reputação
-* Limite dinâmico de empréstimos por usuário
+* **Cadastro de usuários**: Identificação e autenticação.
+* **Autenticação**: Acesso seguro via Bearer Token (JWT).
+* **Cadastro de livros**: Inclusão de novos exemplares com ISBN e status inicial.
+* **Busca de livros**: Localização de títulos disponíveis para empréstimo.
+* **Solicitação de empréstimos**: Reserva de exemplares elegíveis.
+* **Aprovação de empréstimos**: Aceite formal do proprietário do livro.
+* **Registro de devolução com atrasos**: Devolução do livro com cálculo de multas e rebaixamento de reputação automático.
+* **Sistema de Reputação Dinâmico**: Controle de permissão de uso baseado no comportamento histórico.
 
 ---
 
 ## 🧠 Regras de Negócio Principais
 
-* Usuário não pode solicitar empréstimo do seu próprio livro.
-* Usuário não pode possuir mais de 3 empréstimos simultâneos.
-* Um livro só pode ter um empréstimo ativo por vez (status: DISPONÍVEL).
-* Usuários com multas pendentes são bloqueados de novos empréstimos.
-* Atrasos na devolução geram redução de 0.5 na reputação por dia de atraso.
-* Apenas o dono do livro pode aprovar empréstimos.
+* **RN01 – Autenticação Obrigatória**: Todos os endpoints de negócio exigem validação via Bearer Token (JWT).
+* **RN02 – Impedimento de Auto-empréstimo**: Um usuário é estritamente proibido de solicitar o empréstimo de seu próprio livro.
+* **RN03 – Limite de Empréstimos Ativos**: Cada usuário só pode ter no máximo **3 empréstimos ativos** simultaneamente.
+* **RN04 – Elegibilidade por Reputação**: O solicitante deve possuir reputação mínima de **4.0** e não ter multas pendentes.
+* **RN05 – Disponibilidade do Livro**: Apenas livros no status `DISPONIVEL` podem receber novas solicitações de empréstimo.
+* **RN06 – Aprovação pelo Proprietário**: Apenas o dono original do livro tem a permissão para aprovar uma solicitação ou confirmar a devolução.
 
 ---
+
+## Casos de Uso
+
+UC1: Solicitar Empréstimo (POST /loans):
+Valida a elegibilidade do leitor e a disponibilidade do exemplar. Se aprovado, o status do livro muda para EMPRESTADO e o empréstimo nasce como PENDENTE.
+UC2: Aprovar Empréstimo (PUT /loans/{id}/approve):
+O dono do livro valida a solicitação. O status do empréstimo transiciona para ATIVO e uma notificação é disparada ao solicitante.
+UC3: Registrar Devolução (PUT /loans/{id}/return):
+Calcula atrasos e penalidades. Se houver atraso, a reputação do usuário é reduzida em 0.5 por dia. O livro retorna ao estado DISPONÍVEL.
 
 ## 📊 Sistema de Reputação
 
-| Média     | Limite de Livros | Acesso ao Sistema |
-| --------- | ---------------- | ----------------- |
-| 0 - 2.9   | 1 livro          | Restrito          |
-| 3.0 - 3.9 | 2 livros         | Normal            |
-| 4.0 - 5.0 | 3 livros         | Total             |
+A reputação do usuário é ajustada dinamicamente com base nas devoluções. Empréstimos devolvidos com atraso reduzem a nota em **0.5 por dia de atraso** (com piso de 0.0).
+
+| Nota Reputação | Limite de Empréstimos | Acesso ao Sistema |
+| :------------- | :-------------------- | :---------------- |
+| **0.0 - 2.9**  | 1 livro               | Restrito          |
+| **3.0 - 3.9**  | 2 livros              | Normal            |
+| **4.0 - 5.0**  | 3 livros              | Total             |
 
 ---
 
-## 🏗️ Arquitetura
+## 🏗️ Arquitetura e Organização de Pastas
 
-Backend estruturado em camadas seguindo princípios de Clean Architecture e SOLID:
+O BOOKSHARE foi desenvolvido seguindo os princípios de **Clean Architecture** e **SOLID**, garantindo o desacoplamento de infraestrutura (banco de dados, HTTP) em relação ao core de negócio (entidades, casos de uso).
 
-* **Controller:** Recebe requisições HTTP e valida DTOs.
-* **Service:** Orquestra a lógica de negócio e regras de domínio.
-* **Repository:** Contratos (Interfaces/Abstract Classes) para injeção de dependência.
-* **Entity:** Modelos de domínio ricos em regras.
-* **Database:** Atualmente utilizando repositórios *In-Memory* para isolamento de testes unitários. Preparado para transição para ORM.
+### Diagrama de Fluxo de Camadas
+
+```mermaid
+graph TD
+    Client[Client HTTP] -->|Requisita PUT/POST| Controller[Controller]
+    Controller -->|Valida DTO| DTO[DTO - Input Validation]
+    Controller -->|Chama Caso de Uso| Service[Service / Use Cases]
+    Service -->|Aplica Regras de Domínio| Entity[Domain Entities]
+    Service -->|Depende de| RepInterface[Repository Interface]
+    RepInterface <|--|Inversão de Dependência| RepImpl[TypeORM Repository Implementation]
+    RepImpl -->|Persiste em| DB[(PostgreSQL Database)]
+    
+    style Client fill:#eceff1,stroke:#37474f,stroke-width:2px
+    style Controller fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px
+    style DTO fill:#eceff1,stroke:#607d8b,stroke-width:1px
+    style Service fill:#e8f5e9,stroke:#43a047,stroke-width:2px
+    style Entity fill:#ffebee,stroke:#e53935,stroke-width:2px
+    style RepInterface fill:#fffde7,stroke:#fbc02d,stroke-width:2px
+    style RepImpl fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px
+    style DB fill:#e0f7fa,stroke:#00acc1,stroke-width:2px
+```
+
+### Estrutura de Diretórios
+
+```
+bookshare-backend/
+├── src/
+│   ├── common/                       # Lógicas compartilhadas (exceções, enums, utils)
+│   │   ├── enums/                    # Estados globais (Ex: BookStatus, LoanStatus)
+│   │   └── exceptions/               # Exceções de negócio (Ex: business.exceptions.ts)
+│   ├── modules/                      # Módulos principais de negócio
+│   │   ├── users/                    # Domínio de Usuários
+│   │   ├── books/                    # Domínio de Livros
+│   │   └── loans/                    # Domínio de Empréstimos
+│   │       ├── controllers/          # Camada de Apresentação (Controladores HTTP)
+│   │       │   └── loans.controller.ts
+│   │       ├── dto/                  # Data Transfer Objects (Validação de entrada)
+│   │       │   ├── create-loan.dto.ts
+│   │       │   └── return-loan.dto.ts
+│   │       ├── entities/             # Entidades de Domínio Ricas
+│   │       │   └── loan.entity.ts
+│   │       ├── repositories/         # Repositórios (Contratos e Implementação TypeORM)
+│   │       │   ├── loans.repository.interface.ts # Contrato da Camada de Domínio
+│   │       │   └── loans-typeorm.repository.ts   # Implementação de Infraestrutura
+│   │       └── services/             # Regras de Negócio e Casos de Uso (Core)
+│   │           └── loans.service.ts
+│   ├── app.module.ts                 # Módulo Raiz da Aplicação
+│   ├── main.ts                       # Entrada de Execução (Bootstrap do NestJS)
+│   └── seed.service.ts               # Serviço de Seed automático para popular dados de teste
+└── tsconfig.json                     # Configurações do compilador TypeScript
+```
 
 ---
 
-## 📦 Entidades
+## 💾 Modelagem de Dados (ERD)
 
-* Usuário
-* Livro
-* Empréstimo
-* Avaliação
-* Notificação
+Abaixo está o Diagrama Entidade-Relacionamento do sistema indicando as associações lógicas e tabelas do banco PostgreSQL:
+
+```mermaid
+erDiagram
+    users ||--o{ books : "cadastra (dono)"
+    users ||--o{ loans : "solicita"
+    books ||--o{ loans : "é associado"
+    
+    users {
+        uuid user_id PK
+        varchar nome
+        varchar email "único"
+        varchar senha
+        float reputacao "default: 5.0"
+        boolean has_multas_pendentes "default: false"
+        timestamp created_at
+        timestamp updated_at
+    }
+    books {
+        uuid book_id PK
+        varchar titulo
+        varchar autor
+        varchar isbn "único"
+        varchar status "DISPONIVEL | EMPRESTADO"
+        uuid dono_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    loans {
+        uuid loan_id PK
+        uuid livro_id FK
+        uuid solicitante_id FK
+        varchar status "PENDENTE | ATIVO | DEVOLVIDO"
+        timestamp data_retorno_prevista "nula/timestamp"
+        timestamp created_at
+        timestamp updated_at
+    }
+```
 
 ---
 
-## 🔌 Endpoints Principais
+## 🔌 Endpoints & Contrato de API
 
-* `POST /users` - Cadastrar usuário
-* `GET /users/{id}` - Buscar perfil do usuário
-* `POST /books` - Cadastrar livro
-* `GET /books/{id}` - Buscar livro
-* `POST /loans` - Solicitar empréstimo
-* `PUT /loans/{id}/approve` - Aprovar empréstimo
-* `PUT /loans/{id}/return` - Registrar devolução
+Para uma documentação completa dos fluxos técnicos de integração, consulte [docs/api-contract.md](file:///c:/Users/GABRIEL%20VIEIRA/Desktop/BOOKSHARE-dsc-2026-01/docs/api-contract.md).
+
+### Resumo dos Endpoints
+
+| Método | Rota | Descrição | Requer Auth (JWT)? |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/users` | Cadastrar um novo usuário no sistema | Não |
+| **GET** | `/users/:id` | Buscar perfil e reputação do usuário | Sim |
+| **POST** | `/books` | Cadastrar um livro pertencente ao usuário | Sim |
+| **GET** | `/books/:id` | Buscar detalhes e status de um livro | Sim |
+| **POST** | `/loans` | Solicitar empréstimo de um livro disponível | Sim |
+| **PUT** | `/loans/:id/approve`| Aprovar o empréstimo (Apenas Dono do Livro) | Sim |
+| **PUT** | `/loans/:id/return` | Confirmar devolução (Apenas Dono do Livro) | Sim |
 
 ---
 
-## ⚙️ Tecnologias
+### Detalhamento Crítico do Caso de Uso 03: Registrar Devolução
 
-* **Backend:** Node.js, NestJS, TypeScript
-* **Testes:** Jest (TDD / Testes Unitários)
-* **Banco de Dados (Previsto):** PostgreSQL
-* **Containerização (Prevista):** Docker & Docker Compose
+#### Rota: `PUT /loans/:id/return`
 
-## ▶️ Como Rodar e Testar
+Confirma a devolução de um exemplar e atualiza o estado geral do sistema, aplicando penalidades em caso de atraso na devolução.
 
-1. **Inicie o Servidor Backend**
-   Navegue até a pasta `bookshare-backend` e inicie a API no modo de desenvolvimento. Isso fará com que o banco de dados seja criado e populado automaticamente através do `SeedService`.
+* **Headers Obrigatórios:**
+  * `Authorization`: `Bearer <token_do_dono_do_livro>` (O token JWT deve pertencer ao proprietário do livro associado ao empréstimo).
+* **Parâmetros de Rota:**
+  * `id`: (UUID) ID do empréstimo ativo.
+
+#### Possíveis Respostas do Servidor:
+
+##### 1. Devolução com Sucesso (Sem atraso)
+* **Status HTTP:** `200 OK`
+* **JSON:**
+```json
+{
+  "loanId": "11111111-1111-1111-1111-111111111111",
+  "statusEmprestimo": "DEVOLVIDO",
+  "statusLivro": "DISPONIVEL"
+}
+```
+
+##### 2. Devolução com Sucesso (Com atraso - Reputação penalizada)
+* **Status HTTP:** `200 OK`
+* **JSON:**
+```json
+{
+  "loanId": "11111111-1111-1111-1111-111111111111",
+  "statusEmprestimo": "DEVOLVIDO",
+  "statusLivro": "DISPONIVEL",
+  "reputacaoAtualizada": 4.5
+}
+```
+
+##### 3. Erro: Empréstimo Não Encontrado
+* **Status HTTP:** `404 Not Found`
+* **JSON:**
+```json
+{
+  "message": "Empréstimo não encontrado.",
+  "error": "Not Found",
+  "statusCode": 404
+}
+```
+
+##### 4. Erro: Usuário não é o Proprietário do Livro
+* **Status HTTP:** `403 Forbidden`
+* **JSON:**
+```json
+{
+  "message": "Usuário não é dono do livro.",
+  "error": "Forbidden",
+  "statusCode": 403
+}
+```
+
+##### 5. Erro: Empréstimo Já Finalizado ou Não Ativo
+* **Status HTTP:** `400 Bad Request`
+* **JSON:**
+```json
+{
+  "message": "O empréstimo não está ativo para ser devolvido.",
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+
+---
+
+## ⚙️ Pré-requisitos & Instalação
+
+### Pré-requisitos
+Certifique-se de ter instalado em sua máquina:
+- **Node.js** (versão `>= 18.0.0`, recomendada a versão `20.x LTS`)
+- **PNPM** (gerenciador de pacotes rápido, versão `>= 9.0.0`)
+- **PostgreSQL** (banco de dados relacional configurado localmente ou via container)
+
+### Guia de Instalação Rápida
+
+1. **Clone o repositório:**
    ```bash
-   cd bookshare-backend
-   pnpm start:dev
+   git clone https://github.com/BOOKSHARE-Project/BOOKSHARE-dsc-2026-01.git
+   cd BOOKSHARE-dsc-2026-01
    ```
 
-2. **Teste os Endpoints (UC03 - Devolução)**
-   Abra o arquivo `tests/api/uc03-return.http` utilizando a extensão **REST Client** no seu editor (ex: VS Code).
-   Certifique-se de que o servidor terminou de iniciar e que você visualizou a mensagem `✅ Seed automático executado com sucesso para os testes TDD.` no terminal.
+2. **Navegue até a pasta da API:**
+   ```bash
+   cd bookshare-backend
+   ```
+
+3. **Instale as dependências:**
+   ```bash
+   pnpm install
+   ```
+
+---
+
+## 📝 Variáveis de Ambiente
+
+Para o funcionamento do banco PostgreSQL, crie um arquivo `.env` dentro da pasta `bookshare-backend/` a partir do modelo disponível em `.env.exemple`:
+
+```bash
+cp .env.exemple .env
+```
+
+Abra o arquivo `.env` e preencha as credenciais correspondentes ao seu ambiente:
+
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=seu_usuario_postgres
+DB_PASSWORD=sua_senha_postgres
+DB_DATABASE=bookshare_db
+PORT=3002
+```
+
+---
+
+## ▶️ Como Rodar a Aplicação
+
+A aplicação utiliza um `SeedService` automático para criar usuários, livros e empréstimos iniciais válidos no banco local sempre que inicia no modo de desenvolvimento. Isso facilita as chamadas e validação da API.
+
+1. **Iniciar no modo de desenvolvimento:**
+   ```bash
+   pnpm run start:dev
+   ```
+   *O console exibirá `✅ Seed automático executado com sucesso para validação HTTP.` confirmando que a base de dados de demonstração está pronta.*
+
+2. **Gerar Build de Produção:**
+   ```bash
+   pnpm run build
+   ```
+
+3. **Iniciar em Produção:**
+   ```bash
+   pnpm run start:prod
+   ```
+
+---
+
+## 🧪 Como Validar com HTTP Request e PNPM
+
+A validação das regras de negócio do BOOKSHARE é realizada por meio de requisições HTTP locais no servidor em execução:
+
+1. **Inicie o servidor de desenvolvimento:**
+   ```bash
+   pnpm run start:dev
+   ```
+
+2. **Execute as chamadas HTTP:**
+   Abra o arquivo [uc03-return.http](file:///c:/Users/GABRIEL%20VIEIRA/Desktop/BOOKSHARE-dsc-2026-01/tests/api/uc03-return.http) utilizando a extensão **REST Client** no seu editor (ex: VS Code) e clique em `Send Request` nos diferentes cenários para validar:
+   - **Devolução com Sucesso** (RN06, status do empréstimo de ATIVO para DEVOLVIDO, status do livro para DISPONIVEL, e cálculo dinâmico de reputação).
+   - **Erro 404** (Empréstimo não encontrado).
+   - **Erro 403** (Usuário logado não é o dono do livro).
    
-   Clique em `Send Request` nos diferentes cenários montados para validar o comportamento da aplicação (Sucesso, 404 e 403).
+   Você também pode utilizar ferramentas como **Postman**, **Insomnia** ou comandos **curl** apontando para a porta `3002`.
 
 ---
 
-## 👤 Autor
+## 📖 Documentação de Endpoints Swagger
 
-Gabriel Moreno
+O ecossistema NestJS possui suporte automático para geração de Swagger. Atualmente, a biblioteca `@nestjs/swagger` está planejada no roadmap do projeto e estará acessível no endpoint `/api/docs` assim que a transição de prototipagem in-memory para persistência Postgres completa for finalizada.
+
+Para o teste atual dos endpoints do **UC03 (Registrar Devolução)**, utilize o arquivo de requisições rápidas em `tests/api/uc03-return.http` usando a extensão **REST Client** do VS Code.
 
 ---
 
-## 📌 Status do Projeto
+## 🤝 Como Contribuir
 
-Em desenvolvimento
+Ficamos muito felizes com qualquer contribuição ao BOOKSHARE! Siga as diretrizes abaixo para colaborar:
+
+1. Faça um **Fork** do projeto.
+2. Crie uma branch com o nome da sua funcionalidade (`git checkout -b feature/minha-feature` ou `git checkout -b refactor/ajuste-x`).
+3. Commit suas alterações utilizando **Conventional Commits** (Ex: `feat: adiciona regra de limite de livros` ou `fix: corrige validacao de status`).
+4. Inicie o servidor e valide as rotas com o arquivo de requisições HTTP (`tests/api/uc03-return.http`) para certificar-se de que nada quebrou.
+5. Execute o linter (`pnpm run lint`) para garantir a formatação do código.
+6. Envie suas alterações para sua branch no Github (`git push origin feature/minha-feature`).
+7. Abra um **Pull Request** para a branch principal (`main`).
+
+---
+
+## 📄 Licença
+
+Este projeto está distribuído sob os termos da licença **MIT**. Veja o arquivo [LICENSE](file:///c:/Users/GABRIEL%20VIEIRA/Desktop/BOOKSHARE-dsc-2026-01/LICENSE) para mais detalhes.
+
+---
+
+## 👤 Autor & Status
+
+* **Autor:** Gabriel Moreno

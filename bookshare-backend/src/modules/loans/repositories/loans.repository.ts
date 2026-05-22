@@ -7,7 +7,12 @@ export interface LoansRepository {
   findByIdWithBook(id: string): Promise<LoanEntity | null>;
   countActiveLoansByUser(userId: string): Promise<number>;
   updateStatus(id: string, status: LoanStatus): Promise<void>;
-  registerReturnTransaction(loanId: string, bookId: string, userId?: string, newReputation?: number): Promise<void>;
+  registerReturnTransaction(
+    loanId: string,
+    bookId: string,
+    userId?: string,
+    newReputation?: number,
+  ): Promise<void>;
   findAll(): Promise<LoanEntity[]>;
 }
 

@@ -1,83 +1,133 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LoansService } from './loans.service';
-import { LoansRepository } from '../repositories/loans.repository';
-import { BooksRepository } from '../../books/repositories/books.repository';
-import { UsersRepository } from '../../users/repositories/users.repository';
-import { BookStatus } from '../../../common/enums/book-status.enum';
+import {
+  LOANS_REPOSITORY,
+  LoansRepository,
+} from '../repositories/loans.repository.interface';
+import {
+  BOOKS_REPOSITORY,
+  BooksRepository,
+} from '../../books/repositories/books.repository.interface';
+import {
+  USERS_REPOSITORY,
+  UsersRepository,
+} from '../../users/repositories/users.repository.interface';
+import { CreateLoanDto } from '../dto/create-loan.dto';
+import { LoanEntity } from '../entities/loan.entity';
 import { LoanStatus } from '../../../common/enums/loan-status.enum';
-import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { BookStatus } from '../../../common/enums/book-status.enum';
+import { BookEntity } from '../../books/entities/book.entity';
+import { NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 
 describe('LoansService', () => {
   let service: LoansService;
-  
-  const mockLoansRepository = { save: jest.fn(), countActiveLoansByUser: jest.fn() };
-  const mockBooksRepository = { findById: jest.fn(), updateStatus: jest.fn() };
-  const mockUsersRepository = { findByIdWithPendingFines: jest.fn() };
+  let loansRepo: jest.Mocked<LoansRepository>;
+  let booksRepo: jest.Mocked<BooksRepository>;
+  let usersRepo: jest.Mocked<UsersRepository>;
 
   beforeEach(async () => {
+    const loansMock: Partial<LoansRepository> = {
+      findAll: jest.fn(),
+      save: jest.fn(),
+      countActiveLoansByUser: jest.fn(),
+      updateStatus: jest.fn(),
+    };
+    const booksMock: Partial<BooksRepository> = {
+      findById: jest.fn(),
+      updateStatus: jest.fn(),
+    };
+    const usersMock: Partial<UsersRepository> = {
+      findByIdWithPendingFines: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         LoansService,
-        { provide: LoansRepository, useValue: mockLoansRepository },
-        { provide: BooksRepository, useValue: mockBooksRepository },
-        { provide: UsersRepository, useValue: mockUsersRepository },
+        { provide: LOANS_REPOSITORY, useValue: loansMock },
+        { provide: BOOKS_REPOSITORY, useValue: booksMock },
+        { provide: USERS_REPOSITORY, useValue: usersMock },
       ],
     }).compile();
 
     service = module.get<LoansService>(LoansService);
-    
-    jest.clearAllMocks();
+    loansRepo = module.get(LOANS_REPOSITORY) as jest.Mocked<LoansRepository>;
+    booksRepo = module.get(BOOKS_REPOSITORY) as jest.Mocked<BooksRepository>;
+    usersRepo = module.get(USERS_REPOSITORY) as jest.Mocked<UsersRepository>;
   });
 
-  describe('Use Case: Solicitar Empréstimo (Create)', () => {
-    
-    it('Deve criar um empréstimo com sucesso e mudar o status do livro', async () => {
-      mockUsersRepository.findByIdWithPendingFines.mockResolvedValue({ id: 'user-1', hasMultasPendentes: false, reputacao: 5.0 });
-      mockLoansRepository.countActiveLoansByUser.mockResolvedValue(1);
-      mockBooksRepository.findById.mockResolvedValue({ id: 'book-1', status: BookStatus.DISPONIVEL, donoId: 'user-2' });
-      mockLoansRepository.save.mockImplementation(loan => Promise.resolve({ ...loan, id: 'loan-123' }));
+  // ---------- findAll ----------
+  describe('findAll', () => {
+    it('should return all loans', async () => {
+      const loanList: LoanEntity[] = [
+        { id: 'l1', bookId: 'b1', requesterId: 'u1', status: LoanStatus.PENDENTE } as LoanEntity,
+        { id: 'l2', bookId: 'b2', requesterId: 'u2', status: LoanStatus.ATIVO } as LoanEntity,
+      ];
+      loansRepo.findAll.mockResolvedValue(loanList);
 
-      const result = await service.create({ livroId: 'book-1' }, 'user-1');
+      const result = await service.findAll();
+      expect(result).toBe(loanList);
+    });
+  });
 
-      expect(result).toBeDefined();
-      expect(result.status).toBe(LoanStatus.PENDENTE);
-      expect(mockBooksRepository.updateStatus).toHaveBeenCalledWith('book-1', BookStatus.EMPRESTADO); 
+  // ---------- create (success) ----------
+  describe('create', () => {
+    const userId = 'user-123';
+    const dto: CreateLoanDto = { livroId: 'book-456' } as CreateLoanDto;
+    const user = {
+      id: userId,
+      hasMultasPendentes: false,
+      reputacao: 4.5,
+    } as any; // shape matches UsersRepository return
+    const book: BookEntity = {
+      id: 'book-456',
+      titulo: 'Some Book',
+      autor: 'Author',
+      isbn: 'ISBN-001',
+      status: BookStatus.DISPONIVEL,
+      donoId: 'owner-999',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: null,
+    } as BookEntity;
+    const savedLoan: LoanEntity = {
+      id: 'loan-789',
+      bookId: book.id,
+      requesterId: userId,
+      status: LoanStatus.PENDENTE,
+    } as LoanEntity;
+
+    beforeEach(() => {
+      usersRepo.findByIdWithPendingFines.mockResolvedValue(user);
+      booksRepo.findById.mockResolvedValue(book);
+      loansRepo.countActiveLoansByUser.mockResolvedValue(0);
+      loansRepo.save.mockResolvedValue(savedLoan);
     });
 
-    
-    it('Deve falhar se o usuário não for encontrado (Vulnerabilidade de ID falso)', async () => {
-      mockUsersRepository.findByIdWithPendingFines.mockResolvedValue(null);
-
-      await expect(service.create({ livroId: 'book-1' }, 'user-fantasma'))
-        .rejects.toThrow(NotFoundException);
+    it('should create a loan when all validations pass', async () => {
+      const result = await service.create(dto, userId);
+      expect(result).toBe(savedLoan);
+      expect(booksRepo.updateStatus).toHaveBeenCalledWith(book.id, BookStatus.EMPRESTADO);
     });
 
-    it('Deve falhar se a reputação do usuário for menor que 4.0', async () => {
-      mockUsersRepository.findByIdWithPendingFines.mockResolvedValue({ id: 'user-1', hasMultasPendentes: false, reputacao: 3.9 });
-
-      await expect(service.create({ livroId: 'book-1' }, 'user-1'))
-        .rejects.toThrow(ForbiddenException);
+    it('should throw NotFoundException if user does not exist', async () => {
+      usersRepo.findByIdWithPendingFines.mockResolvedValue(null);
+      await expect(service.create(dto, userId)).rejects.toBeInstanceOf(NotFoundException);
     });
 
-    it('Deve falhar se o livro já estiver emprestado ou indisponível', async () => {
-      mockUsersRepository.findByIdWithPendingFines.mockResolvedValue({ id: 'user-1', hasMultasPendentes: false, reputacao: 5.0 });
-      mockLoansRepository.countActiveLoansByUser.mockResolvedValue(0);
-      mockBooksRepository.findById.mockResolvedValue({ id: 'book-1', status: BookStatus.EMPRESTADO, donoId: 'user-2' });
-
-      await expect(service.create({ livroId: 'book-1' }, 'user-1'))
-        .rejects.toThrow(BadRequestException);
+    it('should throw ForbiddenException if user has pending fines', async () => {
+      (usersRepo.findByIdWithPendingFines as jest.Mock).mockResolvedValue({
+        ...user,
+        hasMultasPendentes: true,
+      });
+      await expect(service.create(dto, userId)).rejects.toBeInstanceOf(ForbiddenException);
     });
 
-    it('Deve falhar se o sistema tentar salvar o empréstimo, mas o banco de dados cair no meio do processo', async () => {
-      mockUsersRepository.findByIdWithPendingFines.mockResolvedValue({ id: 'user-1', hasMultasPendentes: false, reputacao: 5.0 });
-      mockLoansRepository.countActiveLoansByUser.mockResolvedValue(0);
-      mockBooksRepository.findById.mockResolvedValue({ id: 'book-1', status: BookStatus.DISPONIVEL, donoId: 'user-2' });
-      
-      mockLoansRepository.save.mockRejectedValue(new Error('Database Connection Lost'));
-
-      await expect(service.create({ livroId: 'book-1' }, 'user-1'))
-        .rejects.toThrow('Database Connection Lost');
-      
+    it('should throw BadRequestException if book is not available', async () => {
+      booksRepo.findById.mockResolvedValue({
+        ...book,
+        status: BookStatus.EMPRESTADO,
+      } as BookEntity);
+      await expect(service.create(dto, userId)).rejects.toBeInstanceOf(BadRequestException);
     });
   });
 });

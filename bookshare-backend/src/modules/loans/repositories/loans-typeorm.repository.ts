@@ -18,7 +18,7 @@ export class LoansTypeOrmRepository implements LoansRepository {
   }
 
   async findAll(): Promise<LoanEntity[]> {
-  return await this.typeOrmRepo.find();
+    return await this.typeOrmRepo.find();
   }
 
   async save(loanData: Partial<LoanEntity>): Promise<LoanEntity> {
@@ -54,11 +54,17 @@ export class LoansTypeOrmRepository implements LoansRepository {
     await queryRunner.startTransaction();
 
     try {
-      await queryRunner.manager.update(LoanEntity, loanId, { status: LoanStatus.DEVOLVIDO });
-      await queryRunner.manager.update(BookEntity, bookId, { status: BookStatus.DISPONIVEL });
+      await queryRunner.manager.update(LoanEntity, loanId, {
+        status: LoanStatus.DEVOLVIDO,
+      });
+      await queryRunner.manager.update(BookEntity, bookId, {
+        status: BookStatus.DISPONIVEL,
+      });
 
       if (userId && newReputation !== undefined) {
-        await queryRunner.manager.update(UserEntity, userId, { reputacao: newReputation });
+        await queryRunner.manager.update(UserEntity, userId, {
+          reputacao: newReputation,
+        });
       }
 
       await queryRunner.commitTransaction();

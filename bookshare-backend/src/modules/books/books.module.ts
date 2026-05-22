@@ -8,9 +8,7 @@ import { BooksTypeOrmRepository } from './repositories/books-typeorm.repository'
 import { BOOKS_REPOSITORY } from './repositories/books.repository.interface';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([BookEntity])
-  ],
+  imports: [TypeOrmModule.forFeature([BookEntity])],
   controllers: [BooksController],
   providers: [
     BooksService,
@@ -19,5 +17,6 @@ import { BOOKS_REPOSITORY } from './repositories/books.repository.interface';
       useClass: BooksTypeOrmRepository,
     },
   ],
-exports: [BOOKS_REPOSITORY, BooksService],})
+  exports: [BOOKS_REPOSITORY, BooksService],
+})
 export class BooksModule {}

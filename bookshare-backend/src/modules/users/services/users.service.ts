@@ -1,12 +1,20 @@
-import { Injectable, ConflictException, NotFoundException, Inject } from '@nestjs/common';
-import { USERS_REPOSITORY, UsersRepository } from '../repositories/users.repository.interface';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  Inject,
+} from '@nestjs/common';
+import {
+  USERS_REPOSITORY,
+  UsersRepository,
+} from '../repositories/users.repository.interface';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../entities/user.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(USERS_REPOSITORY) 
+    @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepository,
   ) {}
 
@@ -22,7 +30,7 @@ export class UsersService {
       dto.email,
       dto.senha,
       5.0,
-      false
+      false,
     );
 
     return this.usersRepository.create(novoUsuario);

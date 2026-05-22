@@ -13,8 +13,7 @@ export class CreateBookDto {
   @IsNotEmpty({ message: 'O ISBN é obrigatório' })
   isbn: string;
 
-  
   @IsNotEmpty({ message: 'O ID do dono é obrigatório.' })
   @IsString()
-  donoId!: string; 
+  donoId!: string;
 }

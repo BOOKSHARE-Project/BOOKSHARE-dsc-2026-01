@@ -24,5 +24,4 @@ export class BooksTypeOrmRepository implements BooksRepository {
   async updateStatus(id: string, status: BookStatus): Promise<void> {
     await this.typeOrmRepo.update(id, { status });
   }
-
 }
