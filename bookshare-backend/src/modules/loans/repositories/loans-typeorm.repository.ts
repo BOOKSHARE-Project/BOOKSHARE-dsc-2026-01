@@ -1,11 +1,12 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { LoansRepository } from './loans.repository';
-import { LoanEntity } from '../entities/loan.entity';
+import { Loan, LoanEntity } from '../entities/loan.entity';
 import { LoanStatus } from '../../../common/enums/loan-status.enum';
 import { BookEntity } from '../../books/entities/book.entity';
 import { BookStatus } from '../../../common/enums/book-status.enum';
 import { UserEntity } from '../../users/entities/user.entity';
+import { UpdateLoanDto } from '../dto/update-loan.dto';
 
 export class LoansTypeOrmRepository implements LoansRepository {
   constructor(
@@ -42,6 +43,11 @@ export class LoansTypeOrmRepository implements LoansRepository {
   async updateStatus(id: string, status: LoanStatus): Promise<void> {
     await this.typeOrmRepo.update(id, { status });
   }
+
+  async update(id: string, data: UpdateLoanDto): Promise<Loan> {
+  await this.typeOrmRepo.update(id, data as any);
+  return this.typeOrmRepo.findOne({ where: { id: id as any } });
+}
 
   async registerReturnTransaction(
     loanId: string,

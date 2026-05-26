@@ -18,9 +18,10 @@ import {
   UsersRepository,
 } from '../../users/repositories/users.repository.interface';
 import { CreateLoanDto } from '../dto/create-loan.dto';
-import { LoanEntity } from '../entities/loan.entity';
+import { Loan, LoanEntity } from '../entities/loan.entity';
 import { LoanStatus } from '../../../common/enums/loan-status.enum';
 import { BookStatus } from '../../../common/enums/book-status.enum';
+import { UpdateLoanDto } from '../dto/update-loan.dto';
 
 @Injectable()
 export class LoansService {
@@ -37,6 +38,15 @@ export class LoansService {
 
   async findAll(): Promise<LoanEntity[]> {
     return this.loansRepository.findAll();
+  }
+
+  async update(id: string, data: UpdateLoanDto): Promise<Loan> {
+    const loanExists = await this.loansRepository.findById(id);
+    if (!loanExists) {
+      throw new NotFoundException('Empréstimo não encontrado.');
+    }
+
+    return this.loansRepository.update(id, data);
   }
 
   async create(dto: CreateLoanDto, userId: string): Promise<LoanEntity> {

@@ -38,3 +38,12 @@ export class LoanEntity {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 }
+
+
+export class Loan {
+  constructor(
+    public id: string,
+    public bookId: string,
+    public requesterId: string,
+  ) {}
+}

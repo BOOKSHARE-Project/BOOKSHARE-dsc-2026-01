@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { UsersRepository } from './users.repository';
 import { UserEntity } from '../entities/user.entity';
 import { User } from '../entities/user.entity';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UsersTypeOrmRepository implements UsersRepository {
@@ -40,4 +41,10 @@ export class UsersTypeOrmRepository implements UsersRepository {
   async updateReputation(id: string, novaReputacao: number): Promise<void> {
     await this.typeOrmRepo.update(id, { reputacao: novaReputacao });
   }
+
+  async update(id: string, data: UpdateUserDto): Promise<User> {
+    await this.typeOrmRepo.update(id, data);
+    return this.typeOrmRepo.findOne({ where: { id } });
+  }
+
 }

@@ -6,6 +6,7 @@ import {
 import { CreateBookDto } from '../dto/create-book.dto';
 import { Book } from '../entities/book.entity';
 import { BookStatus } from '../../../common/enums/book-status.enum';
+import { UpdateBookDto } from '../dto/update-book.dto';
 
 @Injectable()
 export class BooksService {
@@ -50,4 +51,14 @@ export class BooksService {
   async findAll(): Promise<Book[]> {
     return this.booksRepository.findAll();
   }
+
+  async update(id: string, data: UpdateBookDto): Promise<Book> {
+    const bookExists = await this.booksRepository.findById(id);
+    if (!bookExists) {
+      throw new NotFoundException('Livro não encontrado.');
+    }
+
+    return this.booksRepository.update(id, data);
+  }
 }
+

@@ -1,5 +1,6 @@
-import { LoanEntity } from '../entities/loan.entity';
+import { LoanEntity, Loan } from '../entities/loan.entity';
 import { LoanStatus } from '../../../common/enums/loan-status.enum';
+import { UpdateLoanDto } from '../dto/update-loan.dto';
 
 export interface LoansRepository {
   findAll(): Promise<LoanEntity[]>;
@@ -14,6 +15,7 @@ export interface LoansRepository {
     userId?: string,
     newReputation?: number,
   ): Promise<void>;
+  update(id: string, data: UpdateLoanDto): Promise<Loan>;
 }
 
 export const LOANS_REPOSITORY = 'LoansRepository';

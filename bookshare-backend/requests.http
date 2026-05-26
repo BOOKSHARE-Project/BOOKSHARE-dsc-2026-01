@@ -225,3 +225,86 @@ Content-Type: application/json
 {
   "livroId": "{{l4.response.body.id}}"
 }
+
+
+### **07-PATCH-UPDATE** =========================================
+### PATCH - Sucesso (Atualização parcial de um livro existente)
+# Altera apenas o título e o autor, preservando o ISBN e o donoId originais
+PATCH http://localhost:3002/books/{{livro.response.body.id}}
+Content-Type: application/json
+
+{
+  "titulo": "Clean Code - Edição Especial",
+  "autor": "Robert C. Martin (Uncle Bob)"
+}
+
+###
+### Consulta para confirmar a Persistência (Conforme exigido no PDF)
+GET http://localhost:3002/books/{{livro.response.body.id}}
+Content-Type: application/json
+
+###
+### PATCH - Falha (404 - Tentando atualizar ID inexistente)
+PATCH http://localhost:3002/books/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "titulo": "Livro Fantasma"
+}
+
+
+
+### =============================================================
+### PATCH USERS
+### =============================================================
+### PATCH - Usuário com Sucesso (Mudar nome ou email do Leitor 1)
+PATCH http://localhost:3002/users/{{leitor1.response.body.id}}
+Content-Type: application/json
+
+{
+  "nome": "Leitor 1 Alterado",
+  "email": "leitor1_novo@teste.com"
+}
+
+###
+### Consulta para confirmar persistência do Usuário
+GET http://localhost:3002/users/{{leitor1.response.body.id}}
+Content-Type: application/json
+
+###
+### PATCH - Usuário Falha (404)
+PATCH http://localhost:3002/users/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "nome": "Usuário Invisível"
+}
+
+
+### =============================================================
+### PATCH LOANS
+### =============================================================
+### PATCH - Empréstimo com Sucesso (Simular atualização de estado/status)
+PATCH http://localhost:3002/loans/{{emprestimo_sucesso.response.body.id}}
+Content-Type: application/json
+
+{
+  "status": "DEVOLVIDO"
+}
+
+###
+### Consulta para confirmar persistência do Empréstimo
+GET http://localhost:3002/loans/{{emprestimo_sucesso.response.body.id}}
+Content-Type: application/json
+
+###
+### PATCH - Empréstimo Falha (404)
+PATCH http://localhost:3002/loans/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "status": "ATRASADO"
+}
+
+
+

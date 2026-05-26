@@ -7,10 +7,12 @@ import {
   Get,
   Put,
   Headers,
+  Patch,
 } from '@nestjs/common';
 import { LoansService } from '../services/loans.service';
 import { CreateLoanDto } from '../dto/create-loan.dto';
 import { LoanEntity } from '../entities/loan.entity';
+import { UpdateLoanDto } from '../dto/update-loan.dto';
 
 @Controller('loans')
 export class LoansController {
@@ -44,5 +46,10 @@ export class LoansController {
 
     // Repassa os dados para o Service, sem regra de negócio no Controller (Regra Estrita)
     return this.loansService.returnLoan(loanId, userId);
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateLoanDto: UpdateLoanDto) {
+    return this.loansService.update(id, updateLoanDto);
   }
 }

@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BooksRepository } from './books.repository';
-import { BookEntity } from '../entities/book.entity';
+import { Book, BookEntity } from '../entities/book.entity';
 import { BookStatus } from '../../../common/enums/book-status.enum';
+import { UpdateBookDto } from '../dto/update-book.dto';
 
 @Injectable()
 export class BooksTypeOrmRepository implements BooksRepository {
@@ -28,4 +29,11 @@ export class BooksTypeOrmRepository implements BooksRepository {
   async updateStatus(id: string, status: BookStatus): Promise<void> {
     await this.typeOrmRepo.update(id, { status });
   }
+
+  async update(id: string, data: UpdateBookDto): Promise<Book> {
+    await this.typeOrmRepo.update(id, data);
+    
+    return this.typeOrmRepo.findOne({ where: { id } });
+  }
+
 }
