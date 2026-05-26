@@ -33,6 +33,10 @@ export class UsersTypeOrmRepository implements UsersRepository {
     return user;
   }
 
+  async findAll(): Promise<User[]> {
+    return await this.typeOrmRepo.find();
+  }
+
   async updateReputation(id: string, novaReputacao: number): Promise<void> {
     await this.typeOrmRepo.update(id, { reputacao: novaReputacao });
   }

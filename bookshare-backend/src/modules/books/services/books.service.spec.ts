@@ -15,6 +15,7 @@ describe('BooksService', () => {
     const repositoryMock: Partial<BooksRepository> = {
       create: jest.fn(),
       findById: jest.fn(),
+      findAll: jest.fn(),
       updateStatus: jest.fn(),
     };
 
@@ -86,6 +87,44 @@ describe('BooksService', () => {
     it('should throw NotFoundException when book does not exist', async () => {
       repository.findById.mockResolvedValue(null);
       await expect(service.findById('nonexistent')).rejects.toBeInstanceOf(NotFoundException);
+    });
+  });
+
+  describe('findOne', () => {
+    it('SUCCESS SCENARIO: should return the correct book when existing ID is provided', async () => {
+      // Arrange
+      const bookId = 'book-uuid-001';
+      const expectedBook = new BookEntity();
+      expectedBook.id = bookId;
+      expectedBook.titulo = 'Clean Code';
+      expectedBook.autor = 'Robert C. Martin';
+      expectedBook.isbn = '978-0132350884';
+      expectedBook.status = BookStatus.DISPONIVEL;
+      expectedBook.donoId = 'owner-uuid-001';
+      expectedBook.createdAt = new Date();
+      expectedBook.updatedAt = new Date();
+      expectedBook.deletedAt = null;
+
+      repository.findById.mockResolvedValue(expectedBook);
+
+      // Act
+      const result = await service.findOne(bookId);
+
+      // Assert
+      expect(result).toEqual(expectedBook);
+      expect(repository.findById).toHaveBeenCalledWith(bookId);
+      expect(repository.findById).toHaveBeenCalledTimes(1);
+    });
+
+    it('FAILURE SCENARIO (404): should throw NotFoundException when non-existent ID is provided', async () => {
+      // Arrange
+      const nonExistentId = 'invalid-uuid';
+      repository.findById.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(service.findOne(nonExistentId)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne(nonExistentId)).rejects.toThrow('Livro não encontrado.');
+      expect(repository.findById).toHaveBeenCalledWith(nonExistentId);
     });
   });
 });

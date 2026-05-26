@@ -7,5 +7,6 @@ export interface UsersRepository {
   findById(id: string): Promise<UserEntity | null>;
   findByEmail(email: string): Promise<UserEntity | null>;
   findByIdWithPendingFines(id: string): Promise<UserEntity | null>;
+  findAll(): Promise<UserEntity[]>;
   updateReputation(id: string, novaReputacao: number): Promise<void>;
 }

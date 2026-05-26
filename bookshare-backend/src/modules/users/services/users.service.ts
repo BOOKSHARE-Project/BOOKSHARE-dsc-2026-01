@@ -43,4 +43,8 @@ export class UsersService {
     }
     return user;
   }
+
+  async findAll(): Promise<User[]> {
+    return this.usersRepository.findAll();
+  }
 }

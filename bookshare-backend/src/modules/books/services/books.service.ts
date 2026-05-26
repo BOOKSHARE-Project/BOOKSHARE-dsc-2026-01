@@ -36,4 +36,18 @@ export class BooksService {
 
     return book;
   }
+
+  async findOne(id: string): Promise<Book> {
+    const book = await this.booksRepository.findById(id);
+
+    if (!book) {
+      throw new NotFoundException('Livro não encontrado.');
+    }
+
+    return book;
+  }
+
+  async findAll(): Promise<Book[]> {
+    return this.booksRepository.findAll();
+  }
 }

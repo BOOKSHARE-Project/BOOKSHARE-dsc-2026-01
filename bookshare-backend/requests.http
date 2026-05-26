@@ -1,117 +1,227 @@
 ### ==========================================
-### 1. SETUP INICIAL (Rodar sempre primeiro)
+### BOOKSHARE API - TESTES CONSOLIDADOS
+### Arquivo Master com todos os testes
+### ==========================================
+
+### **01-SETUP** =========================================
+### Criar usuário DONO
 # @name dono
 POST http://localhost:3002/users
 Content-Type: application/json
 
-{ "nome": "Dono", "email": "dono@teste.com", "senha": "senhaSegura123" }
+{
+  "nome": "Dono",
+  "email": "dono@teste.com",
+  "senha": "senhaSegura123"
+}
 
 ###
+# Criar usuário LEITOR 1
 # @name leitor1
 POST http://localhost:3002/users
 Content-Type: application/json
 
-{ "nome": "Leitor 1", "email": "leitor1@teste.com", "senha": "senhaSegura123" }
+{
+  "nome": "Leitor 1",
+  "email": "leitor1@teste.com",
+  "senha": "senhaSegura123"
+}
 
 ###
+# Criar usuário LEITOR 2
 # @name leitor2
 POST http://localhost:3002/users
 Content-Type: application/json
 
-{ "nome": "Leitor 2", "email": "leitor2@teste.com", "senha": "senhaSegura123" }
+{
+  "nome": "Leitor 2",
+  "email": "leitor2@teste.com",
+  "senha": "senhaSegura123"
+}
 
 ###
+# Criar livro base (para testes de empréstimo)
 # @name livro
 POST http://localhost:3002/books
 Content-Type: application/json
 
-{ "titulo": "Clean Code", "autor": "Uncle Bob", "isbn": "111", "donoId": "{{dono.response.body.id}}" }
+{
+  "titulo": "Clean Code",
+  "autor": "Uncle Bob",
+  "isbn": "111",
+  "donoId": "{{dono.response.body.id}}"
+}
 
-### ==========================================
-### TESTE A: EMPRÉSTIMO COM SUCESSO
-# O Leitor 1 pega o livro. Deve retornar 201.
-# @name emprestimo_sucesso
-POST http://localhost:3002/loans/{{leitor1.response.body.id}}
-Content-Type: application/json
-
-{ "livroId": "{{livro.response.body.id}}" }
-
-
-### ==========================================
-### TESTE B: LIVRO JÁ EMPRESTADO (ERRO 400)
-POST http://localhost:3002/loans/{{leitor2.response.body.id}}
-Content-Type: application/json
-
-{ "livroId": "{{livro.response.body.id}}" }
-
-
-### ==========================================
-### TESTE C: DONO TENTA PEGAR O PRÓPRIO LIVRO (ERRO 400)
+###
+# Criar livro do dono (para teste de auto-empréstimo)
 # @name livro_do_dono
 POST http://localhost:3002/books
 Content-Type: application/json
 
-{ "titulo": "Meu Livro", "autor": "Eu", "isbn": "222", "donoId": "{{dono.response.body.id}}" }
+{
+  "titulo": "Meu Livro",
+  "autor": "Eu",
+  "isbn": "222",
+  "donoId": "{{dono.response.body.id}}"
+}
 
-### Tentativa de auto-empréstimo:
-POST http://localhost:3002/loans/{{dono.response.body.id}}
-Content-Type: application/json
-
-{ "livroId": "{{livro_do_dono.response.body.id}}" }
-
-
-### ==========================================
-### TESTE D: LIMITE DE EMPRÉSTIMOS (ERRO 400)
-
+### **02-CREATE-BOOKS** =========================================
+###
 # @name l1
 POST http://localhost:3002/books
 Content-Type: application/json
 
-{ "titulo": "Livro 1", "autor": "A", "isbn": "1", "donoId": "{{dono.response.body.id}}" }
+{
+  "titulo": "Livro 1",
+  "autor": "A",
+  "isbn": "1",
+  "donoId": "{{dono.response.body.id}}"
+}
 
 ###
 # @name l2
 POST http://localhost:3002/books
 Content-Type: application/json
 
-{ "titulo": "Livro 2", "autor": "B", "isbn": "2", "donoId": "{{dono.response.body.id}}" }
+{
+  "titulo": "Livro 2",
+  "autor": "B",
+  "isbn": "2",
+  "donoId": "{{dono.response.body.id}}"
+}
 
 ###
 # @name l3
 POST http://localhost:3002/books
 Content-Type: application/json
 
-{ "titulo": "Livro 3", "autor": "C", "isbn": "3", "donoId": "{{dono.response.body.id}}" }
+{
+  "titulo": "Livro 3",
+  "autor": "C",
+  "isbn": "3",
+  "donoId": "{{dono.response.body.id}}"
+}
 
 ###
 # @name l4
 POST http://localhost:3002/books
 Content-Type: application/json
 
-{ "titulo": "Livro 4", "autor": "D", "isbn": "4", "donoId": "{{dono.response.body.id}}" }
+{
+  "titulo": "Livro 4",
+  "autor": "D",
+  "isbn": "4",
+  "donoId": "{{dono.response.body.id}}"
+}
 
-### Realizar 3 empréstimos para Leitor 2 (Sucesso)
-POST http://localhost:3002/loans/{{leitor2.response.body.id}}
+### **03-CREATE-LOANS** =========================================
+###
+# @name emprestimo_sucesso
+POST http://localhost:3002/loans/{{leitor1.response.body.id}}
 Content-Type: application/json
 
-{ "livroId": "{{l1.response.body.id}}" }
+{
+  "livroId": "{{livro.response.body.id}}"
+}
 
 ###
 POST http://localhost:3002/loans/{{leitor2.response.body.id}}
 Content-Type: application/json
 
-{ "livroId": "{{l2.response.body.id}}" }
+{
+  "livroId": "{{l1.response.body.id}}"
+}
 
 ###
 POST http://localhost:3002/loans/{{leitor2.response.body.id}}
 Content-Type: application/json
 
-{ "livroId": "{{l3.response.body.id}}" }
+{
+  "livroId": "{{l2.response.body.id}}"
+}
 
-### Tentativa do 4º empréstimo (Falha)
-# Esperado: "Usuário já possui o limite de 3 empréstimos ativos."
+###
 POST http://localhost:3002/loans/{{leitor2.response.body.id}}
 Content-Type: application/json
 
+{
+  "livroId": "{{l3.response.body.id}}"
+}
 
-{ "livroId": "{{l4.response.body.id}}" }
+### **04-FINDALL** =========================================
+###
+# Listar todos os livros
+GET http://localhost:3002/books
+Content-Type: application/json
+
+###
+# Listar todos os usuários
+GET http://localhost:3002/users
+Content-Type: application/json
+
+###
+# Listar todos os empréstimos
+GET http://localhost:3002/loans
+Content-Type: application/json
+
+### **05-FINDONE** =========================================
+###
+# BOOKS - Sucesso
+# @name get_book_success
+GET http://localhost:3002/books/{{livro.response.body.id}}
+Content-Type: application/json
+
+###
+# BOOKS - Falha (404)
+GET http://localhost:3002/books/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+###
+# USERS - Sucesso
+# @name get_user_success
+GET http://localhost:3002/users/{{dono.response.body.id}}
+Content-Type: application/json
+
+###
+# USERS - Falha (404)
+GET http://localhost:3002/users/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+###
+# LOANS - Sucesso
+# @name get_loan_success
+GET http://localhost:3002/loans/{{emprestimo_sucesso.response.body.id}}
+Content-Type: application/json
+
+###
+# LOANS - Falha (404)
+GET http://localhost:3002/loans/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+### **06-BUSINESS-RULES** =========================================
+###
+# TESTE B: Livro já emprestado
+POST http://localhost:3002/loans/{{leitor2.response.body.id}}
+Content-Type: application/json
+
+{
+  "livroId": "{{livro.response.body.id}}"
+}
+
+###
+# TESTE C: Dono tenta pegar próprio livro
+POST http://localhost:3002/loans/{{dono.response.body.id}}
+Content-Type: application/json
+
+{
+  "livroId": "{{livro_do_dono.response.body.id}}"
+}
+
+###
+# TESTE D: Limite de empréstimos
+POST http://localhost:3002/loans/{{leitor2.response.body.id}}
+Content-Type: application/json
+
+{
+  "livroId": "{{l4.response.body.id}}"
+}

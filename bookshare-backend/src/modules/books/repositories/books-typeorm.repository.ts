@@ -21,6 +21,10 @@ export class BooksTypeOrmRepository implements BooksRepository {
     return await this.typeOrmRepo.findOne({ where: { id } });
   }
 
+  async findAll(): Promise<any[]> {
+    return await this.typeOrmRepo.find();
+  }
+
   async updateStatus(id: string, status: BookStatus): Promise<void> {
     await this.typeOrmRepo.update(id, { status });
   }
