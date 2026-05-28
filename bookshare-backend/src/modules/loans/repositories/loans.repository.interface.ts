@@ -16,6 +16,7 @@ export interface LoansRepository {
     newReputation?: number,
   ): Promise<void>;
   update(id: string, data: UpdateLoanDto): Promise<Loan>;
+  remove(loan: LoanEntity): Promise<void>;
 }
 
 export const LOANS_REPOSITORY = 'LoansRepository';

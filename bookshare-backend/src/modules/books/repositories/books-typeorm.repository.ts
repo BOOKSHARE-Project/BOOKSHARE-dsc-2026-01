@@ -36,4 +36,8 @@ export class BooksTypeOrmRepository implements BooksRepository {
     return this.typeOrmRepo.findOne({ where: { id } });
   }
 
+  async remove(book: BookEntity): Promise<void> {
+    await this.typeOrmRepo.remove(book);
+  }
+
 }

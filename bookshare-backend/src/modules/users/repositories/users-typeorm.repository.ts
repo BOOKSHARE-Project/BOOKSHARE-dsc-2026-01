@@ -53,4 +53,9 @@ export class UsersTypeOrmRepository implements UsersRepository {
       entity.hasMultasPendentes,
     );
   }
+
+  async remove(user: UserEntity): Promise<void> {
+  await this.typeOrmRepo.remove(user);
+}
+
 }

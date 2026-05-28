@@ -308,3 +308,48 @@ Content-Type: application/json
 
 
 
+### =============================================================
+### 08 - EXCLUSÃO CONTROLADA (DELETE)
+### =============================================================
+
+### DELETE 1: Listar Livros para escolher um ID existente 
+GET http://localhost:3002/books
+Content-Type: application/json
+
+### Configure o ID retornado na variável abaixo antes do próximo passo 
+@bookIdParaDeletar = cole_o_id_aqui
+
+### DELETE 2: Buscar o livro antes de remover para garantir que ele existe 
+GET http://localhost:3002/books/{{bookIdParaDeletar}}
+Content-Type: application/json
+
+### DELETE 3: Remover o livro existente com sucesso 
+DELETE http://localhost:3002/books/{{bookIdParaDeletar}}
+Content-Type: application/json
+
+### DELETE 4: Confirmar remoção (Espera-se 404 Not Found)
+GET http://localhost:3002/books/{{bookIdParaDeletar}}
+Content-Type: application/json
+
+### DELETE 5: Tentar remover um ID inexistente (Espera-se 404 Not Found)
+DELETE http://localhost:3002/books/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+
+
+
+### =============================================================
+### 09 - CONSULTAR PERFIL E REPUTAÇÃO (UC04)
+### =============================================================
+
+### PROFILE 1: Buscar perfil do LEITOR 1 (Calcula Limites e Nível)
+GET http://localhost:3002/users/{{leitor1.response.body.id}}/profile
+Content-Type: application/json
+
+### PROFILE 1.1: Se preferir ver o perfil do DONO
+GET http://localhost:3002/users/{{dono.response.body.id}}/profile
+Content-Type: application/json
+
+### PROFILE 2: Tentar buscar perfil de ID inexistente (Espera 404 Not Found)
+GET http://localhost:3002/users/00000000-0000-0000-0000-000000000000/profile
+Content-Type: application/json

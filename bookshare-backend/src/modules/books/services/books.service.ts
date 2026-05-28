@@ -28,6 +28,7 @@ export class BooksService {
     return this.booksRepository.create(novoLivro);
   }
 
+
   async findById(id: string): Promise<Book> {
     const book = await this.booksRepository.findById(id);
 
@@ -60,5 +61,20 @@ export class BooksService {
 
     return this.booksRepository.update(id, data);
   }
+
+  async remove(id: string) {
+    const book = await this.booksRepository.findById(id);
+    
+    if (!book) {
+      throw new NotFoundException('Livro não encontrado.');
+    }
+
+    await this.booksRepository.remove(book);
+
+    return {
+      message: 'Livro removido com sucesso.',
+    };
+  }
 }
+
 

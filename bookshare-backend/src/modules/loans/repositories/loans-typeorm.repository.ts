@@ -81,4 +81,7 @@ export class LoansTypeOrmRepository implements LoansRepository {
       await queryRunner.release();
     }
   }
+     async remove(loan: LoanEntity): Promise<void> {
+     await this.typeOrmRepo.remove(loan);
+}
 }

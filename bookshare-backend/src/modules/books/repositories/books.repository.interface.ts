@@ -10,6 +10,7 @@ export interface BooksRepository {
   findAll(): Promise<BookEntity[]>;
   updateStatus(id: string, status: BookStatus): Promise<void>;
   update(id: string, data: UpdateBookDto): Promise<Book>;
+  remove(book: BookEntity): Promise<void>;
 }
 
 

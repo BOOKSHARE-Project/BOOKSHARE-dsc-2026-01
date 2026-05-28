@@ -10,5 +10,7 @@ export interface UsersRepository {
   findByIdWithPendingFines(id: string): Promise<UserEntity | null>;
   findAll(): Promise<UserEntity[]>;
   updateReputation(id: string, novaReputacao: number): Promise<void>;
- update(id: string, data: UpdateUserDto): Promise<User>;
+  update(id: string, data: UpdateUserDto): Promise<User>;
+  remove(user: UserEntity): Promise<void>;
+  
 }

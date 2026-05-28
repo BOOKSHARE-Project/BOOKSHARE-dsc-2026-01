@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './modules/users/entities/user.entity';
 import { BookEntity } from './modules/books/entities/book.entity';
@@ -15,23 +15,22 @@ import { SeedService } from './seed.service';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: '127.0.0.1',
+      port: 5433,
+      username: 'mrn',
+      password: 'Ping2012',
+      database: 'bookshare_db',
+      entities: [UserEntity, BookEntity, LoanEntity],
+      synchronize: true,
+      dropSchema: false,
+    }),
+
     UsersModule,
     BooksModule,
     LoansModule,
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DB_HOST'),
-        port: Number(configService.get<string>('DB_PORT')),
-        username: configService.get<string>('DB_USER'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_DATABASE'),
-        entities: [UserEntity, BookEntity, LoanEntity],
-        synchronize: true,
-        dropSchema: false,
-      }),
-    }),
   ],
   controllers: [AppController],
   providers: [AppService, SeedService],

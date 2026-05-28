@@ -11,6 +11,7 @@ import {
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../entities/user.entity';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { UserProfileResponseDto } from '../dto/user-profile-response.dto';
 
 @Injectable()
 export class UsersService {
@@ -48,7 +49,7 @@ export class UsersService {
   async findAll(): Promise<User[]> {
     return this.usersRepository.findAll();
   }
-async update(id: string, data: UpdateUserDto): Promise<User> {
+  async update(id: string, data: UpdateUserDto): Promise<User> {
     const userExists = await this.usersRepository.findById(id);
     if (!userExists) {
       throw new NotFoundException('Usuário não encontrado.');
@@ -56,4 +57,43 @@ async update(id: string, data: UpdateUserDto): Promise<User> {
 
     return this.usersRepository.update(id, data);
   }
-}
+   async remove(id: string) {
+    const user = await this.usersRepository.findById(id);
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
+    await this.usersRepository.remove(user);
+    return { message: 'Usuário removido com sucesso.' };
+  }
+
+  async getProfile(id: string): Promise<UserProfileResponseDto> {
+    const user = await this.usersRepository.findById(id);
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    let limiteLivros = '1 livro';
+    let acessoSistema = 'Restrito';
+
+    if (user.reputacao >= 3.0 && user.reputacao <= 3.9) {
+      limiteLivros = '2 livros';
+      acessoSistema = 'Normal';
+    } else if (user.reputacao >= 4.0 && user.reputacao <= 5.0) {
+      limiteLivros = '3 livros';
+      acessoSistema = 'Total';
+    }
+
+    const statusMultas = user.hasMultasPendentes ? 'PENDENTE' : 'REGULAR';
+
+    return {
+      id: user.id,
+      nome: user.nome,
+      email: user.email,
+      reputacao: Number(user.reputacao),
+      limiteLivros,
+      acessoSistema,
+      statusMultas, 
+    };
+  }
+    };

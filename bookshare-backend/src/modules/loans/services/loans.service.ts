@@ -215,4 +215,14 @@ export class LoansService {
       statusLivro: BookStatus.EMPRESTADO,
     };
   }
+
+  async remove(id: string) {
+    const loan = await this.loansRepository.findById(id);
+    if (!loan) {
+      throw new NotFoundException('Empréstimo não encontrado.');
+    }
+    await this.loansRepository.remove(loan);
+    return { message: 'Empréstimo removido com sucesso.' };
+  }
+  
 }
