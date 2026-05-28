@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BooksRepository } from './books.repository';
+import { BooksRepository } from './books.repository.interface';
 import { Book, BookEntity } from '../entities/book.entity';
 import { BookStatus } from '../../../common/enums/book-status.enum';
 import { UpdateBookDto } from '../dto/update-book.dto';

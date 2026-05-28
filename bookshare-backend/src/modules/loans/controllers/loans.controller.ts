@@ -31,6 +31,16 @@ export class LoansController {
     return this.loansService.findAll();
   }
 
+  @Put(':id/approve')
+  async approveLoan(
+    @Param('id') loanId: string,
+    @Headers('authorization') authHeader: string,
+  ) {
+    const token = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
+    const userId = token;
+    return this.loansService.approveLoan(loanId, userId);
+  }
+
   @Put(':id/return')
   async returnLoan(
     @Param('id') loanId: string,

@@ -177,4 +177,42 @@ export class LoansService {
       reputacaoAtualizada: newReputation,
     };
   }
+
+  async approveLoan(loanId: string, userId: string) {
+    // 1. Validar se o empréstimo existe
+    const loan = await this.loansRepository.findById(loanId);
+    if (!loan) {
+      throw new NotFoundException('Empréstimo não encontrado.');
+    }
+
+    // 2. Validar se o empréstimo está PENDENTE
+    if (loan.status !== LoanStatus.PENDENTE) {
+      throw new BadRequestException(
+        'O empréstimo não está pendente para ser aprovado.',
+      );
+    }
+
+    // 3. Validar se o userId é o dono do livro (RN06)
+    const book = await this.booksRepository.findById(loan.bookId);
+    if (!book) {
+      throw new NotFoundException('Livro não encontrado.');
+    }
+
+    if (book.donoId !== userId) {
+      throw new ForbiddenException('Usuário não é dono do livro.');
+    }
+
+    // 4. Transicionar status do empréstimo para ATIVO e definir a data de retorno prevista (7 dias a partir de hoje)
+    const dataRetornoPrevista = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await this.loansRepository.update(loan.id, {
+      status: LoanStatus.ATIVO,
+      dataRetornoPrevista,
+    } as any);
+
+    return {
+      loanId: loan.id,
+      statusEmprestimo: LoanStatus.ATIVO,
+      statusLivro: BookStatus.EMPRESTADO,
+    };
+  }
 }

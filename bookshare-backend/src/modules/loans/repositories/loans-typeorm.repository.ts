@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { LoansRepository } from './loans.repository';
+import { LoansRepository } from './loans.repository.interface';
 import { Loan, LoanEntity } from '../entities/loan.entity';
 import { LoanStatus } from '../../../common/enums/loan-status.enum';
 import { BookEntity } from '../../books/entities/book.entity';

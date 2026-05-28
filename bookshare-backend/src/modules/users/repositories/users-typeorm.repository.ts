@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UsersRepository } from './users.repository';
+import { UsersRepository } from './users.repository.interface';
 import { UserEntity } from '../entities/user.entity';
 import { User } from '../entities/user.entity';
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -13,28 +13,24 @@ export class UsersTypeOrmRepository implements UsersRepository {
     private readonly typeOrmRepo: Repository<UserEntity>,
   ) {}
 
-  async create(user: User): Promise<User> {
+  async create(user: Partial<UserEntity>): Promise<UserEntity> {
     const createdUser = this.typeOrmRepo.create(user);
-    const savedUser = await this.typeOrmRepo.save(createdUser);
-    return savedUser;
+    return await this.typeOrmRepo.save(createdUser);
   }
 
-  async findById(id: string): Promise<User | null> {
-    const user = await this.typeOrmRepo.findOne({ where: { id } });
-    return user;
+  async findById(id: string): Promise<UserEntity | null> {
+    return await this.typeOrmRepo.findOne({ where: { id } });
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    const user = await this.typeOrmRepo.findOne({ where: { email } });
-    return user;
+  async findByEmail(email: string): Promise<UserEntity | null> {
+    return await this.typeOrmRepo.findOne({ where: { email } });
   }
 
-  async findByIdWithPendingFines(id: string): Promise<User | null> {
-    const user = await this.typeOrmRepo.findOne({ where: { id } });
-    return user;
+  async findByIdWithPendingFines(id: string): Promise<UserEntity | null> {
+    return await this.typeOrmRepo.findOne({ where: { id } });
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserEntity[]> {
     return await this.typeOrmRepo.find();
   }
 
@@ -44,7 +40,17 @@ export class UsersTypeOrmRepository implements UsersRepository {
 
   async update(id: string, data: UpdateUserDto): Promise<User> {
     await this.typeOrmRepo.update(id, data);
-    return this.typeOrmRepo.findOne({ where: { id } });
+    const entity = await this.typeOrmRepo.findOne({ where: { id } });
+    if (!entity) {
+      throw new NotFoundException('User not found');
+    }
+    return new User(
+      entity.id,
+      entity.nome,
+      entity.email,
+      entity.senha,
+      entity.reputacao,
+      entity.hasMultasPendentes,
+    );
   }
-
 }

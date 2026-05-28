@@ -31,6 +31,8 @@ describe('LoansService', () => {
       save: jest.fn(),
       countActiveLoansByUser: jest.fn(),
       updateStatus: jest.fn(),
+      findById: jest.fn(),
+      update: jest.fn(),
     };
     const booksMock: Partial<BooksRepository> = {
       findById: jest.fn(),
@@ -128,6 +130,61 @@ describe('LoansService', () => {
         status: BookStatus.EMPRESTADO,
       } as BookEntity);
       await expect(service.create(dto, userId)).rejects.toBeInstanceOf(BadRequestException);
+    });
+  });
+
+
+  describe('approveLoan', () => {
+    const loanId = 'loan-123';
+    const ownerId = 'owner-999';
+    const loan = {
+      id: loanId,
+      bookId: 'book-456',
+      requesterId: 'requester-111',
+      status: LoanStatus.PENDENTE,
+    } as any;
+    const book = {
+      id: 'book-456',
+      status: BookStatus.DISPONIVEL,
+      donoId: ownerId,
+    } as any;
+
+    beforeEach(() => {
+      loansRepo.findById.mockResolvedValue(loan);
+      booksRepo.findById.mockResolvedValue(book);
+      loansRepo.update.mockResolvedValue({
+        loanId,
+        statusEmprestimo: LoanStatus.ATIVO,
+        statusLivro: BookStatus.EMPRESTADO,
+      } as any);
+    });
+
+    it('should approve a pending loan when user is the book owner', async () => {
+      const result = await service.approveLoan(loanId, ownerId);
+      expect(result).toEqual({
+        loanId,
+        statusEmprestimo: LoanStatus.ATIVO,
+        statusLivro: BookStatus.EMPRESTADO,
+      });
+      expect(loansRepo.update).toHaveBeenCalledWith(loanId, expect.objectContaining({
+        status: LoanStatus.ATIVO,
+        dataRetornoPrevista: expect.any(Date),
+      }));
+    });
+
+    it('should throw NotFoundException if loan does not exist', async () => {
+      loansRepo.findById.mockResolvedValue(null);
+      await expect(service.approveLoan('nonexistent', ownerId)).rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('should throw BadRequestException if loan is not pending', async () => {
+      loansRepo.findById.mockResolvedValue({ ...loan, status: LoanStatus.ATIVO });
+      await expect(service.approveLoan(loanId, ownerId)).rejects.toBeInstanceOf(BadRequestException);
+    });
+
+    it('should throw ForbiddenException if user is not the book owner', async () => {
+      booksRepo.findById.mockResolvedValue({ ...book, donoId: 'different-owner' });
+      await expect(service.approveLoan(loanId, ownerId)).rejects.toBeInstanceOf(ForbiddenException);
     });
   });
 });
