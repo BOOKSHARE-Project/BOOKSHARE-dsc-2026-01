@@ -63,7 +63,19 @@ export class UsersService {
       throw new UserNotFoundException();
     }
 
-    return this.usersRepository.update(id, data);
+    if (data.email && data.email !== userExists.email) {
+      const emailExists = await this.usersRepository.findByEmail(data.email);
+      if (emailExists) {
+        throw new EmailAlreadyInUseException();
+      }
+    }
+
+    const updateData = { ...data };
+    if (data.senha) {
+      updateData.senha = await this.hashProvider.hash(data.senha);
+    }
+
+    return this.usersRepository.update(id, updateData);
   }
 
   async remove(id: string) {

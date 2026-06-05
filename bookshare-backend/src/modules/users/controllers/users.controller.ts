@@ -43,6 +43,12 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard, UserSelfGuard)
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.usersService.findById(id);
+  }
+
+  @UseGuards(JwtAuthGuard, UserSelfGuard)
   @Get(':id/profile')
   async getProfile(@Param('id') id: string): Promise<UserProfileResponseDto> {
     return this.usersService.getProfile(id);
