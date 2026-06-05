@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 
 export class UserLowReputationException extends BadRequestException {
   constructor() {
@@ -43,5 +43,11 @@ export class EmailAlreadyInUseException extends ConflictException {
 export class UserNotFoundException extends NotFoundException {
   constructor() {
     super('Usuário não encontrado.');
+  }
+}
+
+export class InvalidCredentialsException extends UnauthorizedException {
+  constructor() {
+    super('Credenciais inválidas.');
   }
 }
