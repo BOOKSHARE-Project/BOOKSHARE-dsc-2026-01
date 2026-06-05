@@ -13,6 +13,7 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserProfileResponseDto } from '../dto/user-profile-response.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { UserSelfGuard } from '../../auth/guards/user-self.guard';
 
 @Controller('users')
 export class UsersController {
@@ -29,19 +30,19 @@ export class UsersController {
     return this.usersService.create(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, UserSelfGuard)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, UserSelfGuard)
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, UserSelfGuard)
   @Get(':id/profile')
   async getProfile(@Param('id') id: string): Promise<UserProfileResponseDto> {
     return this.usersService.getProfile(id);

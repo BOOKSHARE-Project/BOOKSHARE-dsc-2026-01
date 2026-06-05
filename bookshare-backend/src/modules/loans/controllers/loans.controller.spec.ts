@@ -6,6 +6,9 @@ import { CreateLoanDto } from '../dto/create-loan.dto';
 import { LoanEntity } from '../entities/loan.entity';
 import { GUARDS_METADATA } from '@nestjs/common/constants';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { LoanBookOwnerGuard } from '../../auth/guards/loan-book-owner.guard';
+import { LOANS_REPOSITORY } from '../repositories/loans.repository.interface';
+import { BOOKS_REPOSITORY } from '../../books/repositories/books.repository.interface';
 
 import { JwtService } from '@nestjs/jwt';
 
@@ -23,6 +26,8 @@ describe('LoansController', () => {
       providers: [
         { provide: LoansService, useValue: serviceMock },
         { provide: JwtService, useValue: {} },
+        { provide: LOANS_REPOSITORY, useValue: {} },
+        { provide: BOOKS_REPOSITORY, useValue: {} },
       ],
     }).compile();
 
@@ -36,6 +41,22 @@ describe('LoansController', () => {
         | unknown[]
         | undefined;
       expect(guards).toContain(JwtAuthGuard);
+    });
+
+    it('should protect approveLoan endpoint with LoanBookOwnerGuard', () => {
+      const guards = Reflect.getMetadata(
+        GUARDS_METADATA,
+        LoansController.prototype.approveLoan,
+      ) as unknown[] | undefined;
+      expect(guards).toContain(LoanBookOwnerGuard);
+    });
+
+    it('should protect returnLoan endpoint with LoanBookOwnerGuard', () => {
+      const guards = Reflect.getMetadata(
+        GUARDS_METADATA,
+        LoansController.prototype.returnLoan,
+      ) as unknown[] | undefined;
+      expect(guards).toContain(LoanBookOwnerGuard);
     });
   });
 

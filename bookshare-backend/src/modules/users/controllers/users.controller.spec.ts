@@ -4,6 +4,7 @@ import { UsersController } from './users.controller';
 import { UsersService } from '../services/users.service';
 import { GUARDS_METADATA } from '@nestjs/common/constants';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { UserSelfGuard } from '../../auth/guards/user-self.guard';
 import { JwtService } from '@nestjs/jwt';
 
 describe('UsersController Guards', () => {
@@ -43,27 +44,30 @@ describe('UsersController Guards', () => {
     expect(guards).toContain(JwtAuthGuard);
   });
 
-  it('should protect update endpoint', () => {
+  it('should protect update endpoint with JwtAuthGuard and UserSelfGuard', () => {
     const guards = Reflect.getMetadata(
       GUARDS_METADATA,
       UsersController.prototype.update,
     ) as unknown[] | undefined;
     expect(guards).toContain(JwtAuthGuard);
+    expect(guards).toContain(UserSelfGuard);
   });
 
-  it('should protect remove endpoint', () => {
+  it('should protect remove endpoint with JwtAuthGuard and UserSelfGuard', () => {
     const guards = Reflect.getMetadata(
       GUARDS_METADATA,
       UsersController.prototype.remove,
     ) as unknown[] | undefined;
     expect(guards).toContain(JwtAuthGuard);
+    expect(guards).toContain(UserSelfGuard);
   });
 
-  it('should protect getProfile endpoint', () => {
+  it('should protect getProfile endpoint with JwtAuthGuard and UserSelfGuard', () => {
     const guards = Reflect.getMetadata(
       GUARDS_METADATA,
       UsersController.prototype.getProfile,
     ) as unknown[] | undefined;
     expect(guards).toContain(JwtAuthGuard);
+    expect(guards).toContain(UserSelfGuard);
   });
 });

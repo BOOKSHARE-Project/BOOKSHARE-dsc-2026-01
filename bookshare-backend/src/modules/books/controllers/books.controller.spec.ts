@@ -5,6 +5,7 @@ import { CreateBookDto } from '../dto/create-book.dto';
 
 import { GUARDS_METADATA } from '@nestjs/common/constants';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { BookOwnerGuard } from '../../auth/guards/book-owner.guard';
 
 import { JwtService } from '@nestjs/jwt';
 
@@ -46,11 +47,27 @@ describe('BooksController', () => {
   });
 
   describe('guards', () => {
-    it('should be protected by JwtAuthGuard', () => {
+    it('should be protected by JwtAuthGuard at class level', () => {
       const guards = Reflect.getMetadata(GUARDS_METADATA, BooksController) as
         | unknown[]
         | undefined;
       expect(guards).toContain(JwtAuthGuard);
+    });
+
+    it('should protect update endpoint with BookOwnerGuard', () => {
+      const guards = Reflect.getMetadata(
+        GUARDS_METADATA,
+        BooksController.prototype.update,
+      ) as unknown[] | undefined;
+      expect(guards).toContain(BookOwnerGuard);
+    });
+
+    it('should protect remove endpoint with BookOwnerGuard', () => {
+      const guards = Reflect.getMetadata(
+        GUARDS_METADATA,
+        BooksController.prototype.remove,
+      ) as unknown[] | undefined;
+      expect(guards).toContain(BookOwnerGuard);
     });
   });
 });
