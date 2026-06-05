@@ -1,0 +1,53 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { LoansController } from './loans.controller';
+import { LoansService } from '../services/loans.service';
+import { CreateLoanDto } from '../dto/create-loan.dto';
+import { GUARDS_METADATA } from '@nestjs/common/constants';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+
+describe('LoansController', () => {
+  let controller: LoansController;
+  let service: jest.Mocked<LoansService>;
+
+  beforeEach(async () => {
+    const serviceMock: Partial<LoansService> = {
+      create: jest.fn(),
+    };
+
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [LoansController],
+      providers: [{ provide: LoansService, useValue: serviceMock }],
+    }).compile();
+
+    controller = module.get<LoansController>(LoansController);
+    service = module.get(LoansService) as jest.Mocked<LoansService>;
+  });
+
+  describe('guards', () => {
+    it('should be protected by JwtAuthGuard at class level', () => {
+      const guards = Reflect.getMetadata(GUARDS_METADATA, LoansController);
+      expect(guards).toContain(JwtAuthGuard);
+    });
+  });
+
+  describe('createLoan', () => {
+    it('should extract userId from current user sub and delegate to service', async () => {
+      const dto: CreateLoanDto = {
+        livroId: 'book-uuid-abc',
+      };
+      const currentUser = {
+        sub: 'user-uuid-123',
+        nome: 'John Doe',
+        email: 'john@example.com',
+      };
+
+      const mockLoan = {} as any;
+      service.create.mockResolvedValue(mockLoan);
+
+      const result = await controller.createLoan(currentUser, dto);
+
+      expect(service.create).toHaveBeenCalledWith(dto, currentUser.sub);
+      expect(result).toBe(mockLoan);
+    });
+  });
+});

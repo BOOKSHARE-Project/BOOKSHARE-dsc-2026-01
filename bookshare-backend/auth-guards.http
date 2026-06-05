@@ -1,0 +1,50 @@
+### =============================================================
+### BOOKSHARE API - TESTES DE PROTEÇÃO DE ROTAS (GUARDS)
+### =============================================================
+
+@baseUrl = http://localhost:3002
+
+### 1. Testar GET /users/:id sem token (Esperado: 401 Unauthorized)
+GET {{baseUrl}}/users/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+###
+
+### 2. Testar GET /users/:id/profile sem token (Esperado: 401 Unauthorized)
+GET {{baseUrl}}/users/00000000-0000-0000-0000-000000000000/profile
+Content-Type: application/json
+
+###
+
+### 3. Testar POST /books sem token (Esperado: 401 Unauthorized)
+POST {{baseUrl}}/books
+Content-Type: application/json
+
+{
+  "titulo": "Hackers",
+  "autor": "Steven Levy",
+  "isbn": "99999",
+  "donoId": "00000000-0000-0000-0000-000000000000"
+}
+
+###
+
+### 4. Testar POST /loans sem token (Esperado: 401 Unauthorized)
+POST {{baseUrl}}/loans
+Content-Type: application/json
+
+{
+  "livroId": "00000000-0000-0000-0000-000000000000"
+}
+
+###
+
+### 5. Testar PUT /loans/:id/approve sem token (Esperado: 401 Unauthorized)
+PUT {{baseUrl}}/loans/00000000-0000-0000-0000-000000000000/approve
+Content-Type: application/json
+
+###
+
+### 6. Testar PUT /loans/:id/return sem token (Esperado: 401 Unauthorized)
+PUT {{baseUrl}}/loans/00000000-0000-0000-0000-000000000000/return
+Content-Type: application/json

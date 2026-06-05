@@ -3,6 +3,9 @@ import { BooksController } from './books.controller';
 import { BooksService } from '../services/books.service';
 import { CreateBookDto } from '../dto/create-book.dto';
 
+import { GUARDS_METADATA } from '@nestjs/common/constants';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+
 describe('BooksController', () => {
   let controller: BooksController;
   let service: jest.Mocked<BooksService>;
@@ -34,6 +37,13 @@ describe('BooksController', () => {
       const result = await controller.create(dto);
       expect(service.create).toHaveBeenCalledWith(dto);
       expect(result).toBe(created);
+    });
+  });
+
+  describe('guards', () => {
+    it('should be protected by JwtAuthGuard', () => {
+      const guards = Reflect.getMetadata(GUARDS_METADATA, BooksController);
+      expect(guards).toContain(JwtAuthGuard);
     });
   });
 });
