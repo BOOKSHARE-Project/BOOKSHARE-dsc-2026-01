@@ -1,6 +1,5 @@
 import {
   Injectable,
-  NotFoundException,
   Inject,
 } from '@nestjs/common';
 import {
@@ -11,14 +10,16 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../entities/user.entity';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserProfileResponseDto } from '../dto/user-profile-response.dto';
-import * as bcrypt from 'bcryptjs';
-import { EmailAlreadyInUseException } from '../../../common/exceptions/business.exceptions';
+import { HASH_PROVIDER, HashProvider } from '../providers/hash-provider.interface';
+import { EmailAlreadyInUseException, UserNotFoundException } from '../../../common/exceptions/business.exceptions';
 
 @Injectable()
 export class UsersService {
   constructor(
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepository,
+    @Inject(HASH_PROVIDER)
+    private readonly hashProvider: HashProvider,
   ) {}
 
   async create(dto: CreateUserDto): Promise<User> {
@@ -27,8 +28,7 @@ export class UsersService {
       throw new EmailAlreadyInUseException();
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(dto.senha, salt);
+    const hashedPassword = await this.hashProvider.hash(dto.senha);
 
     const novoUsuario = new User(
       crypto.randomUUID(),
@@ -45,7 +45,7 @@ export class UsersService {
   async findById(id: string): Promise<User> {
     const user = await this.usersRepository.findById(id);
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado.');
+      throw new UserNotFoundException();
     }
     return user;
   }
@@ -53,18 +53,20 @@ export class UsersService {
   async findAll(): Promise<User[]> {
     return this.usersRepository.findAll();
   }
+
   async update(id: string, data: UpdateUserDto): Promise<User> {
     const userExists = await this.usersRepository.findById(id);
     if (!userExists) {
-      throw new NotFoundException('Usuário não encontrado.');
+      throw new UserNotFoundException();
     }
 
     return this.usersRepository.update(id, data);
   }
-   async remove(id: string) {
+
+  async remove(id: string) {
     const user = await this.usersRepository.findById(id);
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado.');
+      throw new UserNotFoundException();
     }
     await this.usersRepository.remove(user);
     return { message: 'Usuário removido com sucesso.' };
@@ -74,7 +76,7 @@ export class UsersService {
     const user = await this.usersRepository.findById(id);
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado.');
+      throw new UserNotFoundException();
     }
 
     let limiteLivros = '1 livro';
@@ -97,7 +99,7 @@ export class UsersService {
       reputacao: Number(user.reputacao),
       limiteLivros,
       acessoSistema,
-      statusMultas, 
+      statusMultas,
     };
   }
-    };
+}
