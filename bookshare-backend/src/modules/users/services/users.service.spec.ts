@@ -4,6 +4,7 @@ import { UsersRepository, USERS_REPOSITORY } from '../repositories/users.reposit
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UserEntity } from '../entities/user.entity';
 import { ConflictException, NotFoundException } from '@nestjs/common';
+import { EmailAlreadyInUseException } from '../../../common/exceptions/business.exceptions';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -32,7 +33,7 @@ describe('UsersService', () => {
 
   // ---------- CREATE ----------
   describe('create', () => {
-    it('should create a new user and return it', async () => {
+    it('should create a new user and return it, saving the password hashed', async () => {
       const dto: CreateUserDto = {
         nome: 'John Doe',
         email: 'john@example.com',
@@ -43,7 +44,7 @@ describe('UsersService', () => {
       createdUser.id = 'user-uuid';
       createdUser.nome = dto.nome;
       createdUser.email = dto.email;
-      createdUser.senha = dto.senha;
+      createdUser.senha = 'some-hashed-password-placeholder';
       createdUser.reputacao = 5.0;
       createdUser.hasMultasPendentes = false;
       createdUser.createdAt = new Date();
@@ -59,12 +60,14 @@ describe('UsersService', () => {
         expect.objectContaining({
           nome: dto.nome,
           email: dto.email,
-          senha: dto.senha,
         }),
       );
+
+      const savedUser = repository.create.mock.calls[0][0];
+      expect(savedUser.senha).not.toBe(dto.senha);
     });
 
-    it('should throw ConflictException when email already exists', async () => {
+    it('should throw EmailAlreadyInUseException when email already exists', async () => {
       const dto: CreateUserDto = {
         nome: 'Jane',
         email: 'existing@example.com',
@@ -75,7 +78,7 @@ describe('UsersService', () => {
       existing.id = 'existing-id';
       repository.findByEmail.mockResolvedValue(existing);
 
-      await expect(service.create(dto)).rejects.toBeInstanceOf(ConflictException);
+      await expect(service.create(dto)).rejects.toBeInstanceOf(EmailAlreadyInUseException);
     });
   });
 
