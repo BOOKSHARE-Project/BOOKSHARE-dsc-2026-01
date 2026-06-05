@@ -40,9 +40,52 @@ Content-Type: application/json
 }
 
 ###
+### Login DONO
+# @name loginDono
+POST http://localhost:3002/auth/login
+Content-Type: application/json
+
+{
+  "email": "dono@teste.com",
+  "senha": "senhaSegura123"
+}
+
+###
+@tokenDono = {{loginDono.response.body.accessToken}}
+
+###
+### Login LEITOR 1
+# @name loginLeitor1
+POST http://localhost:3002/auth/login
+Content-Type: application/json
+
+{
+  "email": "leitor1@teste.com",
+  "senha": "senhaSegura123"
+}
+
+###
+@tokenLeitor1 = {{loginLeitor1.response.body.accessToken}}
+
+###
+### Login LEITOR 2
+# @name loginLeitor2
+POST http://localhost:3002/auth/login
+Content-Type: application/json
+
+{
+  "email": "leitor2@teste.com",
+  "senha": "senhaSegura123"
+}
+
+###
+@tokenLeitor2 = {{loginLeitor2.response.body.accessToken}}
+
+###
 # Criar livro base (para testes de empréstimo)
 # @name livro
 POST http://localhost:3002/books
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 {
@@ -56,6 +99,7 @@ Content-Type: application/json
 # Criar livro do dono (para teste de auto-empréstimo)
 # @name livro_do_dono
 POST http://localhost:3002/books
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 {
@@ -69,6 +113,7 @@ Content-Type: application/json
 ###
 # @name l1
 POST http://localhost:3002/books
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 {
@@ -81,6 +126,7 @@ Content-Type: application/json
 ###
 # @name l2
 POST http://localhost:3002/books
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 {
@@ -93,6 +139,7 @@ Content-Type: application/json
 ###
 # @name l3
 POST http://localhost:3002/books
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 {
@@ -105,6 +152,7 @@ Content-Type: application/json
 ###
 # @name l4
 POST http://localhost:3002/books
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 {
@@ -117,7 +165,8 @@ Content-Type: application/json
 ### **03-CREATE-LOANS** =========================================
 ###
 # @name emprestimo_sucesso
-POST http://localhost:3002/loans/{{leitor1.response.body.id}}
+POST http://localhost:3002/loans
+Authorization: Bearer {{tokenLeitor1}}
 Content-Type: application/json
 
 {
@@ -125,7 +174,8 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3002/loans/{{leitor2.response.body.id}}
+POST http://localhost:3002/loans
+Authorization: Bearer {{tokenLeitor2}}
 Content-Type: application/json
 
 {
@@ -133,7 +183,8 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3002/loans/{{leitor2.response.body.id}}
+POST http://localhost:3002/loans
+Authorization: Bearer {{tokenLeitor2}}
 Content-Type: application/json
 
 {
@@ -141,7 +192,8 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3002/loans/{{leitor2.response.body.id}}
+POST http://localhost:3002/loans
+Authorization: Bearer {{tokenLeitor2}}
 Content-Type: application/json
 
 {
@@ -152,16 +204,19 @@ Content-Type: application/json
 ###
 # Listar todos os livros
 GET http://localhost:3002/books
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ###
 # Listar todos os usuários
 GET http://localhost:3002/users
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ###
 # Listar todos os empréstimos
 GET http://localhost:3002/loans
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ### **05-FINDONE** =========================================
@@ -169,39 +224,46 @@ Content-Type: application/json
 # BOOKS - Sucesso
 # @name get_book_success
 GET http://localhost:3002/books/{{livro.response.body.id}}
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ###
 # BOOKS - Falha (404)
 GET http://localhost:3002/books/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ###
 # USERS - Sucesso
 # @name get_user_success
 GET http://localhost:3002/users/{{dono.response.body.id}}
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ###
 # USERS - Falha (404)
 GET http://localhost:3002/users/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ###
 # LOANS - Sucesso
 # @name get_loan_success
 GET http://localhost:3002/loans/{{emprestimo_sucesso.response.body.id}}
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ###
 # LOANS - Falha (404)
 GET http://localhost:3002/loans/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ### **06-BUSINESS-RULES** =========================================
 ###
 # TESTE B: Livro já emprestado
-POST http://localhost:3002/loans/{{leitor2.response.body.id}}
+POST http://localhost:3002/loans
+Authorization: Bearer {{tokenLeitor2}}
 Content-Type: application/json
 
 {
@@ -210,7 +272,8 @@ Content-Type: application/json
 
 ###
 # TESTE C: Dono tenta pegar próprio livro
-POST http://localhost:3002/loans/{{dono.response.body.id}}
+POST http://localhost:3002/loans
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 {
@@ -219,7 +282,8 @@ Content-Type: application/json
 
 ###
 # TESTE D: Limite de empréstimos
-POST http://localhost:3002/loans/{{leitor2.response.body.id}}
+POST http://localhost:3002/loans
+Authorization: Bearer {{tokenLeitor2}}
 Content-Type: application/json
 
 {
@@ -231,6 +295,7 @@ Content-Type: application/json
 ### PATCH - Sucesso (Atualização parcial de um livro existente)
 # Altera apenas o título e o autor, preservando o ISBN e o donoId originais
 PATCH http://localhost:3002/books/{{livro.response.body.id}}
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 {
@@ -241,11 +306,13 @@ Content-Type: application/json
 ###
 ### Consulta para confirmar a Persistência (Conforme exigido no PDF)
 GET http://localhost:3002/books/{{livro.response.body.id}}
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ###
 ### PATCH - Falha (404 - Tentando atualizar ID inexistente)
 PATCH http://localhost:3002/books/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 {
@@ -259,6 +326,7 @@ Content-Type: application/json
 ### =============================================================
 ### PATCH - Usuário com Sucesso (Mudar nome ou email do Leitor 1)
 PATCH http://localhost:3002/users/{{leitor1.response.body.id}}
+Authorization: Bearer {{tokenLeitor1}}
 Content-Type: application/json
 
 {
@@ -269,11 +337,13 @@ Content-Type: application/json
 ###
 ### Consulta para confirmar persistência do Usuário
 GET http://localhost:3002/users/{{leitor1.response.body.id}}
+Authorization: Bearer {{tokenLeitor1}}
 Content-Type: application/json
 
 ###
-### PATCH - Usuário Falha (404)
+### PATCH - Usuário Falha (403 Forbidden - Token não corresponde ao ID)
 PATCH http://localhost:3002/users/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{tokenLeitor1}}
 Content-Type: application/json
 
 {
@@ -286,6 +356,7 @@ Content-Type: application/json
 ### =============================================================
 ### PATCH - Empréstimo com Sucesso (Simular atualização de estado/status)
 PATCH http://localhost:3002/loans/{{emprestimo_sucesso.response.body.id}}
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 {
@@ -295,11 +366,13 @@ Content-Type: application/json
 ###
 ### Consulta para confirmar persistência do Empréstimo
 GET http://localhost:3002/loans/{{emprestimo_sucesso.response.body.id}}
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ###
 ### PATCH - Empréstimo Falha (404)
 PATCH http://localhost:3002/loans/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 {
@@ -314,6 +387,7 @@ Content-Type: application/json
 
 ### DELETE 1: Listar Livros para escolher um ID existente 
 GET http://localhost:3002/books
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ### Configure o ID retornado na variável abaixo antes do próximo passo 
@@ -321,18 +395,71 @@ Content-Type: application/json
 
 ### DELETE 2: Buscar o livro antes de remover para garantir que ele existe 
 GET http://localhost:3002/books/{{bookIdParaDeletar}}
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ### DELETE 3: Remover o livro existente com sucesso 
 DELETE http://localhost:3002/books/{{bookIdParaDeletar}}
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ### DELETE 4: Confirmar remoção (Espera-se 404 Not Found)
 GET http://localhost:3002/books/{{bookIdParaDeletar}}
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
 ### DELETE 5: Tentar remover um ID inexistente (Espera-se 404 Not Found)
 DELETE http://localhost:3002/books/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{tokenDono}}
+Content-Type: application/json
+
+### -------------------------------------------------------------
+### EXCLUSÃO DE USUÁRIO (TDD / CRUD Refatorado)
+### -------------------------------------------------------------
+
+### Criar usuário temporário para deletar
+# @name leitorTemp
+POST http://localhost:3002/users
+Content-Type: application/json
+
+{
+  "nome": "Temporario",
+  "email": "temp@teste.com",
+  "senha": "senhaSegura123"
+}
+
+###
+### Login Usuário Temporário
+# @name loginTemp
+POST http://localhost:3002/auth/login
+Content-Type: application/json
+
+{
+  "email": "temp@teste.com",
+  "senha": "senhaSegura123"
+}
+
+###
+@tokenTemp = {{loginTemp.response.body.accessToken}}
+
+### DELETE 6: Buscar usuário temporário antes de remover
+GET http://localhost:3002/users/{{leitorTemp.response.body.id}}
+Authorization: Bearer {{tokenTemp}}
+Content-Type: application/json
+
+### DELETE 7: Remover o usuário temporário com sucesso
+DELETE http://localhost:3002/users/{{leitorTemp.response.body.id}}
+Authorization: Bearer {{tokenTemp}}
+Content-Type: application/json
+
+### DELETE 8: Confirmar remoção (Espera-se 404 Not Found)
+GET http://localhost:3002/users/{{leitorTemp.response.body.id}}
+Authorization: Bearer {{tokenTemp}}
+Content-Type: application/json
+
+### DELETE 9: Tentar remover usuário que já foi deletado (Espera-se 404 Not Found)
+DELETE http://localhost:3002/users/{{leitorTemp.response.body.id}}
+Authorization: Bearer {{tokenTemp}}
 Content-Type: application/json
 
 
@@ -344,12 +471,15 @@ Content-Type: application/json
 
 ### PROFILE 1: Buscar perfil do LEITOR 1 (Calcula Limites e Nível)
 GET http://localhost:3002/users/{{leitor1.response.body.id}}/profile
+Authorization: Bearer {{tokenLeitor1}}
 Content-Type: application/json
 
 ### PROFILE 1.1: Se preferir ver o perfil do DONO
 GET http://localhost:3002/users/{{dono.response.body.id}}/profile
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
 
-### PROFILE 2: Tentar buscar perfil de ID inexistente (Espera 404 Not Found)
+### PROFILE 2: Tentar buscar perfil de ID inexistente (Espera 403 Forbidden - pois o token do Dono não tem permissão para acessar outro ID)
 GET http://localhost:3002/users/00000000-0000-0000-0000-000000000000/profile
+Authorization: Bearer {{tokenDono}}
 Content-Type: application/json
