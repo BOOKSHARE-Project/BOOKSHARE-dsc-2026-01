@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 
 export class UserLowReputationException extends BadRequestException {
   constructor() {
@@ -31,5 +31,17 @@ export class UserHasPendingFinesException extends BadRequestException {
 export class MaxActiveLoansExceededException extends BadRequestException {
   constructor() {
     super('Limite máximo de 3 empréstimos ativos simultâneos atingido.');
+  }
+}
+
+export class EmailAlreadyInUseException extends ConflictException {
+  constructor() {
+    super('Este e-mail já está em uso.');
+  }
+}
+
+export class UserNotFoundException extends NotFoundException {
+  constructor() {
+    super('Usuário não encontrado.');
   }
 }
