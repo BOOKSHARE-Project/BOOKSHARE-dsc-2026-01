@@ -3,6 +3,7 @@ import { USERS_REPOSITORY, UsersRepository } from '../../users/repositories/user
 import { HASH_PROVIDER, HashProvider } from '../../users/providers/hash-provider.interface';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from '../dto/login.dto';
+import { InvalidCredentialsException } from '../../../common/exceptions/business.exceptions';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +16,23 @@ export class AuthService {
   ) {}
 
   async login(dto: LoginDto): Promise<{ accessToken: string }> {
-    return { accessToken: '' };
+    const user = await this.usersRepository.findByEmail(dto.email);
+    if (!user) {
+      throw new InvalidCredentialsException();
+    }
+
+    const passwordMatches = await this.hashProvider.compare(dto.senha, user.senha);
+    if (!passwordMatches) {
+      throw new InvalidCredentialsException();
+    }
+
+    const payload = {
+      sub: user.id,
+      nome: user.nome,
+      email: user.email,
+    };
+
+    const accessToken = this.jwtService.sign(payload);
+    return { accessToken };
   }
 }
