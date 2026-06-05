@@ -9,6 +9,7 @@ import { LoanEntity } from './modules/loans/entities/loan.entity';
 import { UsersModule } from './modules/users/users.module';
 import { BooksModule } from './modules/books/books.module';
 import { LoansModule } from './modules/loans/loans.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 import { SeedService } from './seed.service';
 
@@ -35,6 +36,7 @@ import { SeedService } from './seed.service';
     UsersModule,
     BooksModule,
     LoansModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, SeedService],
