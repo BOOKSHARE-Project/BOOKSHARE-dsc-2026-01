@@ -1,0 +1,169 @@
+### =============================================================
+### BOOKSHARE API - VALIDAÇÃO DE AUTENTICAÇÃO E GUARDS (EXEMPLOS EXPANDIDOS)
+### =============================================================
+### Este arquivo demonstra cenários de sucesso e falha para:
+### - Login em fracasso (email inexistente ou senha errada)
+### - Login com sucesso (obtenção de JWT)
+### - Rota protegida com fracasso (sem token ou token inválido -> 401 Unauthorized)
+### - Rota protegida com fracasso de autorização (tentativa de acessar recurso de outro -> 403 Forbidden)
+### - Rota protegida com sucesso (acesso autorizado)
+
+@baseUrl = http://localhost:3002
+
+### -------------------------------------------------------------
+### SETUP: Criar dois usuários para os testes de autorização cruzada
+
+### 1. Criar Usuário A (Leitor)
+# @name registrarLeitor
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "nome": "Leitor Validacao",
+  "email": "leitor.val@teste.com",
+  "senha": "senhaValida123"
+}
+
+###
+@idLeitor = {{registrarLeitor.response.body.id}}
+
+
+### 2. Criar Usuário B (Outro Usuário)
+# @name registrarOutro
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "nome": "Outro Usuario Validacao",
+  "email": "outro.val@teste.com",
+  "senha": "senhaValida123"
+}
+
+###
+@idOutro = {{registrarOutro.response.body.id}}
+
+###
+
+
+### =============================================================
+### CASO 1: LOGIN EM FRACASSO
+### =============================================================
+
+### Cenário A: E-mail inexistente
+### Esperado: 401 Unauthorized ("Credenciais inválidas.")
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "naoexiste_usuario@teste.com",
+  "senha": "qualquerSenha123"
+}
+
+###
+
+### Cenário B: Senha incorreta para usuário existente
+### Esperado: 401 Unauthorized ("Credenciais inválidas.")
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "leitor.val@teste.com",
+  "senha": "senhaTotalmenteErrada"
+}
+
+###
+
+
+### =============================================================
+### CASO 2: LOGIN COM SUCESSO
+### =============================================================
+
+### Realiza o login com sucesso como Usuário A
+# @name loginLeitor
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "leitor.val@teste.com",
+  "senha": "senhaValida123"
+}
+
+###
+@tokenLeitor = {{loginLeitor.response.body.accessToken}}
+
+###
+
+### Realiza o login com sucesso como Usuário B
+# @name loginOutro
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "outro.val@teste.com",
+  "senha": "senhaValida123"
+}
+
+###
+@tokenOutro = {{loginOutro.response.body.accessToken}}
+
+###
+
+
+### =============================================================
+### CASO 3: ROTA PROTEGIDA COM FRACASSO (AUTENTICAÇÃO / 401)
+### =============================================================
+
+### Cenário A: Listar livros sem passar nenhum token
+### Esperado: 401 Unauthorized ("Token não fornecido.")
+GET {{baseUrl}}/books
+Content-Type: application/json
+
+###
+
+### Cenário B: Listar livros com token inválido
+### Esperado: 401 Unauthorized ("Token inválido ou expirado.")
+GET {{baseUrl}}/books
+Authorization: Bearer token_falso_e_invalido
+Content-Type: application/json
+
+###
+
+
+### =============================================================
+### CASO 4: ROTA PROTEGIDA COM FRACASSO (AUTORIZAÇÃO / 403 - GUARDAS)
+### =============================================================
+
+### Cenário A: Usuário A (Leitor) tenta obter perfil do Usuário B
+### Regra: UserSelfGuard protege o endpoint, exigindo que o id da rota corresponda ao token.
+### Esperado: 403 Forbidden (Guarda bloqueia acesso a ID de terceiro)
+GET {{baseUrl}}/users/{{idOutro}}/profile
+Authorization: Bearer {{tokenLeitor}}
+Content-Type: application/json
+
+###
+
+
+### =============================================================
+### CASO 5: ROTA PROTEGIDA COM SUCESSO
+### =============================================================
+
+### Cenário A: Usuário A (Leitor) obtém seu próprio perfil com sucesso
+### Esperado: 200 OK
+GET {{baseUrl}}/users/{{idLeitor}}/profile
+Authorization: Bearer {{tokenLeitor}}
+Content-Type: application/json
+
+###
+
+### Cenário B: Usuário A (Leitor) cadastra um livro usando seu token
+### Esperado: 201 Created
+POST {{baseUrl}}/books
+Authorization: Bearer {{tokenLeitor}}
+Content-Type: application/json
+
+{
+  "titulo": "O Senhor dos Anéis",
+  "autor": "J.R.R. Tolkien",
+  "isbn": "9788595086357",
+  "donoId": "{{idLeitor}}"
+}
