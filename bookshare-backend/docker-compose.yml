@@ -16,6 +16,26 @@ services:
     networks:
       - bookshare_network
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bookshare-app
+    restart: always
+    ports:
+      - "3002:3002"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=mrn
+      - DB_PASSWORD=Ping2012
+      - DB_DATABASE=bookshare_db
+      - PORT=3002
+    depends_on:
+      - db
+    networks:
+      - bookshare_network
+
 volumes:
   bookshare_pg_data:
 
