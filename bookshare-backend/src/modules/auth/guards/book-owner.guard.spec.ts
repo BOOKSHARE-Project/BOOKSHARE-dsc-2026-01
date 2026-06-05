@@ -1,4 +1,8 @@
-import { ExecutionContext, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { BookOwnerGuard } from './book-owner.guard';
 import { BooksService } from '../../books/services/books.service';
 
@@ -72,7 +76,9 @@ describe('BookOwnerGuard', () => {
   });
 
   it('should throw NotFoundException when book does not exist', async () => {
-    booksService.findOne.mockRejectedValue(new NotFoundException('Livro não encontrado.'));
+    booksService.findOne.mockRejectedValue(
+      new NotFoundException('Livro não encontrado.'),
+    );
 
     const request = {
       params: {

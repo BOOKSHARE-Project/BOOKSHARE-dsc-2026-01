@@ -48,7 +48,9 @@ describe('UserSelfGuard', () => {
     } as ExecutionContext;
 
     expect(() => guard.canActivate(context)).toThrow(
-      new ForbiddenException('Acesso negado: você não tem permissão para acessar este recurso.'),
+      new ForbiddenException(
+        'Acesso negado: você não tem permissão para acessar este recurso.',
+      ),
     );
   });
 
