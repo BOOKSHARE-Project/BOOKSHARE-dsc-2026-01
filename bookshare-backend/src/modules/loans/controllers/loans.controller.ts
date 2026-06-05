@@ -14,6 +14,7 @@ import { LoanEntity } from '../entities/loan.entity';
 import { UpdateLoanDto } from '../dto/update-loan.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
+import { LoanBookOwnerGuard } from '../../auth/guards/loan-book-owner.guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('loans')
@@ -34,6 +35,7 @@ export class LoansController {
   }
 
   @Put(':id/approve')
+  @UseGuards(LoanBookOwnerGuard)
   async approveLoan(
     @Param('id') loanId: string,
     @CurrentUser() user: { sub: string },
@@ -42,6 +44,7 @@ export class LoansController {
   }
 
   @Put(':id/return')
+  @UseGuards(LoanBookOwnerGuard)
   async returnLoan(
     @Param('id') loanId: string,
     @CurrentUser() user: { sub: string },

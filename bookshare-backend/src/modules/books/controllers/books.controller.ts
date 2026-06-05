@@ -12,6 +12,7 @@ import { BooksService } from '../services/books.service';
 import { CreateBookDto } from '../dto/create-book.dto';
 import { UpdateBookDto } from '../dto/update-book.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { BookOwnerGuard } from '../../auth/guards/book-owner.guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('books')
@@ -34,11 +35,13 @@ export class BooksController {
   }
 
   @Patch(':id')
+  @UseGuards(BookOwnerGuard)
   async update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
     return this.booksService.update(id, updateBookDto);
   }
 
   @Delete(':id')
+  @UseGuards(BookOwnerGuard)
   async remove(@Param('id') id: string) {
     return this.booksService.remove(id);
   }
