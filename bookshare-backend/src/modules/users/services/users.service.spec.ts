@@ -3,18 +3,24 @@ import { UsersService } from './users.service';
 import { UsersRepository, USERS_REPOSITORY } from '../repositories/users.repository.interface';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UserEntity } from '../entities/user.entity';
-import { ConflictException, NotFoundException } from '@nestjs/common';
-import { EmailAlreadyInUseException } from '../../../common/exceptions/business.exceptions';
+import { HASH_PROVIDER, HashProvider } from '../providers/hash-provider.interface';
+import { EmailAlreadyInUseException, UserNotFoundException } from '../../../common/exceptions/business.exceptions';
 
 describe('UsersService', () => {
   let service: UsersService;
   let repository: jest.Mocked<UsersRepository>;
+  let hashProvider: jest.Mocked<HashProvider>;
 
   beforeEach(async () => {
     const repositoryMock: Partial<UsersRepository> = {
       create: jest.fn(),
       findById: jest.fn(),
       findByEmail: jest.fn(),
+    };
+
+    const hashProviderMock: Partial<HashProvider> = {
+      hash: jest.fn().mockImplementation(async (val) => `hashed_${val}`),
+      compare: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -24,11 +30,16 @@ describe('UsersService', () => {
           provide: USERS_REPOSITORY,
           useValue: repositoryMock,
         },
+        {
+          provide: HASH_PROVIDER,
+          useValue: hashProviderMock,
+        },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
     repository = module.get(USERS_REPOSITORY) as jest.Mocked<UsersRepository>;
+    hashProvider = module.get(HASH_PROVIDER) as jest.Mocked<HashProvider>;
   });
 
   // ---------- CREATE ----------
@@ -44,7 +55,7 @@ describe('UsersService', () => {
       createdUser.id = 'user-uuid';
       createdUser.nome = dto.nome;
       createdUser.email = dto.email;
-      createdUser.senha = 'some-hashed-password-placeholder';
+      createdUser.senha = 'hashed_securePassword';
       createdUser.reputacao = 5.0;
       createdUser.hasMultasPendentes = false;
       createdUser.createdAt = new Date();
@@ -56,15 +67,18 @@ describe('UsersService', () => {
 
       const result = await service.create(dto);
       expect(result).toBe(createdUser);
+      expect(hashProvider.hash).toHaveBeenCalledWith(dto.senha);
       expect(repository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           nome: dto.nome,
           email: dto.email,
+          senha: 'hashed_securePassword',
         }),
       );
 
       const savedUser = repository.create.mock.calls[0][0];
       expect(savedUser.senha).not.toBe(dto.senha);
+      expect(savedUser.senha).toBe('hashed_securePassword');
     });
 
     it('should throw EmailAlreadyInUseException when email already exists', async () => {
@@ -102,9 +116,9 @@ describe('UsersService', () => {
       expect(result).toBe(user);
     });
 
-    it('should throw NotFoundException when user does not exist', async () => {
+    it('should throw UserNotFoundException when user does not exist', async () => {
       repository.findById.mockResolvedValue(null);
-      await expect(service.findById('nonexistent')).rejects.toBeInstanceOf(NotFoundException);
+      await expect(service.findById('nonexistent')).rejects.toBeInstanceOf(UserNotFoundException);
     });
   });
 });
