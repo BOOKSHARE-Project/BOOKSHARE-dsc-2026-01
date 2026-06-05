@@ -117,15 +117,25 @@ Para uma documentação completa dos fluxos técnicos de integração, consulte 
 
 ### Resumo dos Endpoints
 
-| Método | Rota | Descrição | Requer Auth (JWT)? |
-| :--- | :--- | :--- | :--- |
-| **POST** | `/users` | Cadastrar um novo usuário no sistema | Não |
-| **GET** | `/users/:id` | Buscar perfil e reputação do usuário | Sim |
-| **POST** | `/books` | Cadastrar um livro pertencente ao usuário | Sim |
-| **GET** | `/books/:id` | Buscar detalhes e status de um livro | Sim |
-| **POST** | `/loans` | Solicitar empréstimo de um livro disponível | Sim |
-| **PUT** | `/loans/:id/approve`| Aprovar o empréstimo (Apenas Dono do Livro) | Sim |
-| **PUT** | `/loans/:id/return` | Confirmar devolução (Apenas Dono do Livro) | Sim |
+| Método | Rota | Descrição | Requer Auth (JWT)? | Guards Aplicados |
+| :--- | :--- | :--- | :--- | :--- |
+| **POST** | `/auth/login` | Realizar login e obter JWT Bearer Token | Não | - |
+| **POST** | `/users` | Cadastrar um novo usuário (Sign-up) | Não | - |
+| **GET** | `/users` | Listar todos os usuários cadastrados | Sim | `JwtAuthGuard` |
+| **GET** | `/users/:id` | Buscar usuário por ID | Sim | `JwtAuthGuard`, `UserSelfGuard` |
+| **PATCH** | `/users/:id` | Atualizar dados do usuário | Sim | `JwtAuthGuard`, `UserSelfGuard` |
+| **DELETE** | `/users/:id` | Deletar usuário | Sim | `JwtAuthGuard`, `UserSelfGuard` |
+| **GET** | `/users/:id/profile` | Consultar perfil expandido (reputação e limites) | Sim | `JwtAuthGuard`, `UserSelfGuard` |
+| **GET** | `/books` | Listar todos os livros | Sim | `JwtAuthGuard` |
+| **GET** | `/books/:id` | Buscar livro por ID | Sim | `JwtAuthGuard` |
+| **POST** | `/books` | Cadastrar um livro pertencente ao usuário | Sim | `JwtAuthGuard` |
+| **PATCH** | `/books/:id` | Atualizar dados do livro (Apenas Dono) | Sim | `JwtAuthGuard`, `BookOwnerGuard` |
+| **DELETE** | `/books/:id` | Deletar livro (Apenas Dono) | Sim | `JwtAuthGuard`, `BookOwnerGuard` |
+| **GET** | `/loans` | Listar todos os empréstimos | Sim | `JwtAuthGuard` |
+| **POST** | `/loans` | Solicitar empréstimo de um livro disponível | Sim | `JwtAuthGuard` |
+| **PUT** | `/loans/:id/approve` | Aprovar empréstimo (Apenas Dono do Livro) | Sim | `JwtAuthGuard`, `LoanBookOwnerGuard` |
+| **PUT** | `/loans/:id/return` | Confirmar devolução (Apenas Dono do Livro) | Sim | `JwtAuthGuard`, `LoanBookOwnerGuard` |
+| **PATCH** | `/loans/:id` | Atualizar dados de um empréstimo | Sim | `JwtAuthGuard` |
 
 ---
 
@@ -202,7 +212,7 @@ A aplicação utiliza um `SeedService` automático para criar usuários, livros 
 
 ## 🧪 Como Validar com HTTP Request e PNPM
 
-A validação das regras de negócio do BOOKSHARE é realizada por meio de requisições HTTP locais no servidor em execução:
+A validação das regras de negócio e de segurança do BOOKSHARE é realizada por meio de requisições HTTP locais no servidor em execução utilizando os arquivos `.http` na pasta do backend:
 
 1. **Inicie o servidor de desenvolvimento:**
    ```bash
@@ -210,11 +220,11 @@ A validação das regras de negócio do BOOKSHARE é realizada por meio de requi
    ```
 
 2. **Execute as chamadas HTTP:**
-   Abra o arquivo [uc03-return.http](file:///c:/Users/GABRIEL%20VIEIRA/Desktop/BOOKSHARE-dsc-2026-01/tests/api/uc03-return.http) utilizando a extensão **REST Client** no seu editor (ex: VS Code) e clique em `Send Request` nos diferentes cenários para validar:
-   - **Devolução com Sucesso** (RN06, status do empréstimo de ATIVO para DEVOLVIDO, status do livro para DISPONIVEL, e cálculo dinâmico de reputação).
-   - **Erro 404** (Empréstimo não encontrado).
-   - **Erro 403** (Usuário logado não é o dono do livro).
-   
+   Abra os arquivos `.http` dentro de `bookshare-backend/` utilizando a extensão **REST Client** no seu editor (ex: VS Code) e clique em `Send Request` nos diferentes cenários para validar:
+   - **[requests.http](file:///c:/Users/GABRIEL%20VIEIRA/Desktop/BOOKSHARE-dsc-2026-01/bookshare-backend/requests.http)**: Testes consolidados do fluxo geral do sistema (Criação de usuários, login, inserção de livros, criação e controle de empréstimos, atualizações via PATCH, exclusões via DELETE e consulta de perfis com cálculo de reputação).
+   - **[auth-validation.http](file:///c:/Users/GABRIEL%20VIEIRA/Desktop/BOOKSHARE-dsc-2026-01/bookshare-backend/auth-validation.http)**: Cenários detalhados de sucesso e falha de login (credenciais incorretas), rotas protegidas (sem token/token expirado - 401 Unauthorized), e erros de autorização cruzada via guards (tentar acessar/manipular dados de outros usuários - 403 Forbidden).
+   - **[auth-guards.http](file:///c:/Users/GABRIEL%20VIEIRA/Desktop/BOOKSHARE-dsc-2026-01/bookshare-backend/auth-guards.http)**: Validação rápida de bloqueios de acesso direto sem o envio de token JWT para rotas protegidas (esperado 401).
+
    Você também pode utilizar ferramentas como **Postman**, **Insomnia** ou comandos **curl** apontando para a porta `3002`.
 
 ---
@@ -223,7 +233,7 @@ A validação das regras de negócio do BOOKSHARE é realizada por meio de requi
 
 O ecossistema NestJS possui suporte automático para geração de Swagger. Atualmente, a biblioteca `@nestjs/swagger` está planejada no roadmap do projeto e estará acessível no endpoint `/api/docs` assim que a transição de prototipagem in-memory para persistência Postgres completa for finalizada.
 
-Para o teste atual dos endpoints do **UC03 (Registrar Devolução)**, utilize o arquivo de requisições rápidas em `tests/api/uc03-return.http` usando a extensão **REST Client** do VS Code.
+Para o teste atual de todas as rotas e validações de guards, utilize os arquivos de requisições HTTP rápidos mencionados acima.
 
 ---
 
