@@ -70,4 +70,13 @@ describe('UsersController Guards', () => {
     expect(guards).toContain(JwtAuthGuard);
     expect(guards).toContain(UserSelfGuard);
   });
+
+  it('should protect findOne endpoint with JwtAuthGuard and UserSelfGuard', () => {
+    const guards = Reflect.getMetadata(
+      GUARDS_METADATA,
+      UsersController.prototype.findOne,
+    ) as unknown[] | undefined;
+    expect(guards).toContain(JwtAuthGuard);
+    expect(guards).toContain(UserSelfGuard);
+  });
 });
