@@ -12,5 +12,4 @@ export interface UsersRepository {
   updateReputation(id: string, novaReputacao: number): Promise<void>;
   update(id: string, data: UpdateUserDto): Promise<User>;
   remove(user: UserEntity): Promise<void>;
-  
 }

@@ -1,8 +1,19 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Patch,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { BooksService } from '../services/books.service';
 import { CreateBookDto } from '../dto/create-book.dto';
 import { UpdateBookDto } from '../dto/update-book.dto';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
@@ -27,9 +38,8 @@ export class BooksController {
     return this.booksService.update(id, updateBookDto);
   }
 
-  @Delete(':id') 
+  @Delete(':id')
   async remove(@Param('id') id: string) {
     return this.booksService.remove(id);
   }
-
 }

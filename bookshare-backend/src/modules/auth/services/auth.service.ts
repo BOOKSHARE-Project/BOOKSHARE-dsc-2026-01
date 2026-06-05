@@ -1,6 +1,12 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { USERS_REPOSITORY, UsersRepository } from '../../users/repositories/users.repository.interface';
-import { HASH_PROVIDER, HashProvider } from '../../users/providers/hash-provider.interface';
+import {
+  USERS_REPOSITORY,
+  UsersRepository,
+} from '../../users/repositories/users.repository.interface';
+import {
+  HASH_PROVIDER,
+  HashProvider,
+} from '../../users/providers/hash-provider.interface';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from '../dto/login.dto';
 import { InvalidCredentialsException } from '../../../common/exceptions/business.exceptions';
@@ -21,7 +27,10 @@ export class AuthService {
       throw new InvalidCredentialsException();
     }
 
-    const passwordMatches = await this.hashProvider.compare(dto.senha, user.senha);
+    const passwordMatches = await this.hashProvider.compare(
+      dto.senha,
+      user.senha,
+    );
     if (!passwordMatches) {
       throw new InvalidCredentialsException();
     }

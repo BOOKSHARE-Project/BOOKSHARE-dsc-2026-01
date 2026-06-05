@@ -55,7 +55,6 @@ export class UsersTypeOrmRepository implements UsersRepository {
   }
 
   async remove(user: UserEntity): Promise<void> {
-  await this.typeOrmRepo.remove(user);
-}
-
+    await this.typeOrmRepo.remove(user);
+  }
 }

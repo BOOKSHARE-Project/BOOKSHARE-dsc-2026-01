@@ -18,7 +18,11 @@ describe('JwtAuthGuard', () => {
   });
 
   it('should return true and set request.user when Bearer token is valid', async () => {
-    const payload = { sub: 'user-uuid-123', nome: 'John Doe', email: 'john@example.com' };
+    const payload = {
+      sub: 'user-uuid-123',
+      nome: 'John Doe',
+      email: 'john@example.com',
+    };
     jwtService.verifyAsync.mockResolvedValue(payload);
 
     const request = {

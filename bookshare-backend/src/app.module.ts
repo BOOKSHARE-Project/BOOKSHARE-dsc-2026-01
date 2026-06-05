@@ -23,7 +23,9 @@ import { SeedService } from './seed.service';
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get<string>('DB_HOST') || '127.0.0.1',
-        port: configService.get<number>('DB_PORT') ? Number(configService.get('DB_PORT')) : 5433,
+        port: configService.get<number>('DB_PORT')
+          ? Number(configService.get('DB_PORT'))
+          : 5433,
         username: configService.get<string>('DB_USER') || 'mrn',
         password: configService.get<string>('DB_PASSWORD') || 'Ping2012',
         database: configService.get<string>('DB_DATABASE') || 'bookshare_db',

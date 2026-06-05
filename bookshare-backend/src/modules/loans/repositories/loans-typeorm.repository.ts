@@ -45,9 +45,9 @@ export class LoansTypeOrmRepository implements LoansRepository {
   }
 
   async update(id: string, data: UpdateLoanDto): Promise<Loan> {
-  await this.typeOrmRepo.update(id, data as any);
-  return this.typeOrmRepo.findOne({ where: { id: id as any } });
-}
+    await this.typeOrmRepo.update(id, data as any);
+    return this.typeOrmRepo.findOne({ where: { id: id } });
+  }
 
   async registerReturnTransaction(
     loanId: string,
@@ -81,7 +81,7 @@ export class LoansTypeOrmRepository implements LoansRepository {
       await queryRunner.release();
     }
   }
-     async remove(loan: LoanEntity): Promise<void> {
-     await this.typeOrmRepo.remove(loan);
-}
+  async remove(loan: LoanEntity): Promise<void> {
+    await this.typeOrmRepo.remove(loan);
+  }
 }

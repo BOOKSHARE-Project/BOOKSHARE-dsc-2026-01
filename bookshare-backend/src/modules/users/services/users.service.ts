@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  Inject,
-} from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import {
   USERS_REPOSITORY,
   UsersRepository,
@@ -10,8 +7,14 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../entities/user.entity';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserProfileResponseDto } from '../dto/user-profile-response.dto';
-import { HASH_PROVIDER, HashProvider } from '../providers/hash-provider.interface';
-import { EmailAlreadyInUseException, UserNotFoundException } from '../../../common/exceptions/business.exceptions';
+import {
+  HASH_PROVIDER,
+  HashProvider,
+} from '../providers/hash-provider.interface';
+import {
+  EmailAlreadyInUseException,
+  UserNotFoundException,
+} from '../../../common/exceptions/business.exceptions';
 
 @Injectable()
 export class UsersService {

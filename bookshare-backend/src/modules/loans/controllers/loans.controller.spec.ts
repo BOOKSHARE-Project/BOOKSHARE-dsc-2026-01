@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { LoansController } from './loans.controller';
 import { LoansService } from '../services/loans.service';
 import { CreateLoanDto } from '../dto/create-loan.dto';
+import { LoanEntity } from '../entities/loan.entity';
 import { GUARDS_METADATA } from '@nestjs/common/constants';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+
+import { JwtService } from '@nestjs/jwt';
 
 describe('LoansController', () => {
   let controller: LoansController;
@@ -16,16 +20,21 @@ describe('LoansController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [LoansController],
-      providers: [{ provide: LoansService, useValue: serviceMock }],
+      providers: [
+        { provide: LoansService, useValue: serviceMock },
+        { provide: JwtService, useValue: {} },
+      ],
     }).compile();
 
     controller = module.get<LoansController>(LoansController);
-    service = module.get(LoansService) as jest.Mocked<LoansService>;
+    service = module.get(LoansService);
   });
 
   describe('guards', () => {
     it('should be protected by JwtAuthGuard at class level', () => {
-      const guards = Reflect.getMetadata(GUARDS_METADATA, LoansController);
+      const guards = Reflect.getMetadata(GUARDS_METADATA, LoansController) as
+        | unknown[]
+        | undefined;
       expect(guards).toContain(JwtAuthGuard);
     });
   });
@@ -41,7 +50,7 @@ describe('LoansController', () => {
         email: 'john@example.com',
       };
 
-      const mockLoan = {} as any;
+      const mockLoan = {} as LoanEntity;
       service.create.mockResolvedValue(mockLoan);
 
       const result = await controller.createLoan(currentUser, dto);

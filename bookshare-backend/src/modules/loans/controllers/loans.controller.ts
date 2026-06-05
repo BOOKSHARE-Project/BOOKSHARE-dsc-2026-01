@@ -3,27 +3,29 @@ import {
   Post,
   Body,
   Param,
-  ParseUUIDPipe,
   Get,
   Put,
-  Headers,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { LoansService } from '../services/loans.service';
 import { CreateLoanDto } from '../dto/create-loan.dto';
 import { LoanEntity } from '../entities/loan.entity';
 import { UpdateLoanDto } from '../dto/update-loan.dto';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 
+@UseGuards(JwtAuthGuard)
 @Controller('loans')
 export class LoansController {
   constructor(private readonly loansService: LoansService) {}
 
-  @Post(':userId')
+  @Post()
   async createLoan(
-    @Param('userId', ParseUUIDPipe) userId: string,
+    @CurrentUser() user: { sub: string },
     @Body() dto: CreateLoanDto,
   ): Promise<LoanEntity> {
-    return this.loansService.create(dto, userId);
+    return this.loansService.create(dto, user.sub);
   }
 
   @Get()
@@ -34,28 +36,17 @@ export class LoansController {
   @Put(':id/approve')
   async approveLoan(
     @Param('id') loanId: string,
-    @Headers('authorization') authHeader: string,
+    @CurrentUser() user: { sub: string },
   ) {
-    const token = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
-    const userId = token;
-    return this.loansService.approveLoan(loanId, userId);
+    return this.loansService.approveLoan(loanId, user.sub);
   }
 
   @Put(':id/return')
   async returnLoan(
     @Param('id') loanId: string,
-    @Headers('authorization') authHeader: string,
+    @CurrentUser() user: { sub: string },
   ) {
-    // Extrai o ID do usuário simulando o token JWT
-    // (Como não há JwtAuthGuard configurado, extraímos o token manualmente do Header)
-    const token = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
-
-    // Na falta de um decode real, usamos o token como userId.
-    // Em produção, isso viria de request.user populado por um Guard.
-    const userId = token;
-
-    // Repassa os dados para o Service, sem regra de negócio no Controller (Regra Estrita)
-    return this.loansService.returnLoan(loanId, userId);
+    return this.loansService.returnLoan(loanId, user.sub);
   }
 
   @Patch(':id')

@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksService } from './books.service';
-import { BooksRepository, BOOKS_REPOSITORY } from '../repositories/books.repository.interface';
+import {
+  BooksRepository,
+  BOOKS_REPOSITORY,
+} from '../repositories/books.repository.interface';
 import { CreateBookDto } from '../dto/create-book.dto';
 import { BookEntity } from '../entities/book.entity';
 import { BookStatus } from 'src/common/enums/book-status.enum';
@@ -30,7 +33,7 @@ describe('BooksService', () => {
     }).compile();
 
     service = module.get<BooksService>(BooksService);
-    repository = module.get(BOOKS_REPOSITORY) as jest.Mocked<BooksRepository>;
+    repository = module.get(BOOKS_REPOSITORY);
   });
 
   describe('create', () => {
@@ -57,12 +60,14 @@ describe('BooksService', () => {
 
       const result = await service.create(dto);
       expect(result).toBe(createdBook);
-      expect(repository.create).toHaveBeenCalledWith(expect.objectContaining({
-        titulo: dto.titulo,
-        autor: dto.autor,
-        isbn: dto.isbn,
-        donoId: dto.donoId,
-      }));
+      expect(repository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          titulo: dto.titulo,
+          autor: dto.autor,
+          isbn: dto.isbn,
+          donoId: dto.donoId,
+        }),
+      );
     });
   });
 
@@ -86,7 +91,9 @@ describe('BooksService', () => {
 
     it('should throw NotFoundException when book does not exist', async () => {
       repository.findById.mockResolvedValue(null);
-      await expect(service.findById('nonexistent')).rejects.toBeInstanceOf(NotFoundException);
+      await expect(service.findById('nonexistent')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
     });
   });
 
@@ -122,8 +129,12 @@ describe('BooksService', () => {
       repository.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.findOne(nonExistentId)).rejects.toThrow(NotFoundException);
-      await expect(service.findOne(nonExistentId)).rejects.toThrow('Livro não encontrado.');
+      await expect(service.findOne(nonExistentId)).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(service.findOne(nonExistentId)).rejects.toThrow(
+        'Livro não encontrado.',
+      );
       expect(repository.findById).toHaveBeenCalledWith(nonExistentId);
     });
   });

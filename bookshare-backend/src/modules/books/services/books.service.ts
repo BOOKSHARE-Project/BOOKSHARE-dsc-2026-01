@@ -28,7 +28,6 @@ export class BooksService {
     return this.booksRepository.create(novoLivro);
   }
 
-
   async findById(id: string): Promise<Book> {
     const book = await this.booksRepository.findById(id);
 
@@ -64,7 +63,7 @@ export class BooksService {
 
   async remove(id: string) {
     const book = await this.booksRepository.findById(id);
-    
+
     if (!book) {
       throw new NotFoundException('Livro não encontrado.');
     }
@@ -76,5 +75,3 @@ export class BooksService {
     };
   }
 }
-
-

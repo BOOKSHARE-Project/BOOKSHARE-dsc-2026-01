@@ -1,8 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
-import { USERS_REPOSITORY, UsersRepository } from '../../users/repositories/users.repository.interface';
-import { HASH_PROVIDER, HashProvider } from '../../users/providers/hash-provider.interface';
+import {
+  USERS_REPOSITORY,
+  UsersRepository,
+} from '../../users/repositories/users.repository.interface';
+import {
+  HASH_PROVIDER,
+  HashProvider,
+} from '../../users/providers/hash-provider.interface';
 import { UserEntity } from '../../users/entities/user.entity';
 import { InvalidCredentialsException } from '../../../common/exceptions/business.exceptions';
 import { LoginDto } from '../dto/login.dto';
@@ -44,8 +50,8 @@ describe('AuthService', () => {
 
     service = module.get<AuthService>(AuthService);
     jwtService = module.get<JwtService>(JwtService);
-    repository = module.get(USERS_REPOSITORY) as jest.Mocked<UsersRepository>;
-    hashProvider = module.get(HASH_PROVIDER) as jest.Mocked<HashProvider>;
+    repository = module.get(USERS_REPOSITORY);
+    hashProvider = module.get(HASH_PROVIDER);
   });
 
   describe('login', () => {
@@ -92,7 +98,9 @@ describe('AuthService', () => {
       repository.findByEmail.mockResolvedValue(null);
 
       // When & Then
-      await expect(service.login(dto)).rejects.toBeInstanceOf(InvalidCredentialsException);
+      await expect(service.login(dto)).rejects.toBeInstanceOf(
+        InvalidCredentialsException,
+      );
     });
 
     it('should throw InvalidCredentialsException when password comparison fails', async () => {
@@ -112,7 +120,9 @@ describe('AuthService', () => {
       hashProvider.compare.mockResolvedValue(false);
 
       // When & Then
-      await expect(service.login(dto)).rejects.toBeInstanceOf(InvalidCredentialsException);
+      await expect(service.login(dto)).rejects.toBeInstanceOf(
+        InvalidCredentialsException,
+      );
     });
   });
 });

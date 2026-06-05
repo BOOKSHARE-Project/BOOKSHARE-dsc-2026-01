@@ -39,7 +39,6 @@ export class LoanEntity {
   deletedAt: Date | null;
 }
 
-
 export class Loan {
   constructor(
     public id: string,

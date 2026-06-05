@@ -1,10 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { UsersRepository, USERS_REPOSITORY } from '../repositories/users.repository.interface';
+import {
+  UsersRepository,
+  USERS_REPOSITORY,
+} from '../repositories/users.repository.interface';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UserEntity } from '../entities/user.entity';
-import { HASH_PROVIDER, HashProvider } from '../providers/hash-provider.interface';
-import { EmailAlreadyInUseException, UserNotFoundException } from '../../../common/exceptions/business.exceptions';
+import {
+  HASH_PROVIDER,
+  HashProvider,
+} from '../providers/hash-provider.interface';
+import {
+  EmailAlreadyInUseException,
+  UserNotFoundException,
+} from '../../../common/exceptions/business.exceptions';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -38,8 +47,8 @@ describe('UsersService', () => {
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    repository = module.get(USERS_REPOSITORY) as jest.Mocked<UsersRepository>;
-    hashProvider = module.get(HASH_PROVIDER) as jest.Mocked<HashProvider>;
+    repository = module.get(USERS_REPOSITORY);
+    hashProvider = module.get(HASH_PROVIDER);
   });
 
   // ---------- CREATE ----------
@@ -92,7 +101,9 @@ describe('UsersService', () => {
       existing.id = 'existing-id';
       repository.findByEmail.mockResolvedValue(existing);
 
-      await expect(service.create(dto)).rejects.toBeInstanceOf(EmailAlreadyInUseException);
+      await expect(service.create(dto)).rejects.toBeInstanceOf(
+        EmailAlreadyInUseException,
+      );
     });
   });
 
@@ -118,7 +129,9 @@ describe('UsersService', () => {
 
     it('should throw UserNotFoundException when user does not exist', async () => {
       repository.findById.mockResolvedValue(null);
-      await expect(service.findById('nonexistent')).rejects.toBeInstanceOf(UserNotFoundException);
+      await expect(service.findById('nonexistent')).rejects.toBeInstanceOf(
+        UserNotFoundException,
+      );
     });
   });
 });

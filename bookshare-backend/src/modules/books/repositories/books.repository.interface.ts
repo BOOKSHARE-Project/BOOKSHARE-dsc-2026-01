@@ -12,5 +12,3 @@ export interface BooksRepository {
   update(id: string, data: UpdateBookDto): Promise<Book>;
   remove(book: BookEntity): Promise<void>;
 }
-
-

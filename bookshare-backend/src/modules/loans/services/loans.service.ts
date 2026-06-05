@@ -224,5 +224,4 @@ export class LoansService {
     await this.loansRepository.remove(loan);
     return { message: 'Empréstimo removido com sucesso.' };
   }
-  
 }

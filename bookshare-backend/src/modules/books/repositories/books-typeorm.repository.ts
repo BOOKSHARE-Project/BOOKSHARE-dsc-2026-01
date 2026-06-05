@@ -32,12 +32,11 @@ export class BooksTypeOrmRepository implements BooksRepository {
 
   async update(id: string, data: UpdateBookDto): Promise<Book> {
     await this.typeOrmRepo.update(id, data);
-    
+
     return this.typeOrmRepo.findOne({ where: { id } });
   }
 
   async remove(book: BookEntity): Promise<void> {
     await this.typeOrmRepo.remove(book);
   }
-
 }
