@@ -15,7 +15,10 @@ import { SeedService } from './seed.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+      isGlobal: true,
+    }),
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

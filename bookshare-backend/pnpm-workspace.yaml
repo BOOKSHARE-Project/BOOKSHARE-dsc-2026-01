@@ -1,5 +1,7 @@
 allowBuilds:
   '@nestjs/core': true
+  '@scarf/scarf': false
+  sqlite3: true
   unrs-resolver: false
 minimumReleaseAgeExclude:
   - '@typescript-eslint/eslint-plugin@8.60.0'

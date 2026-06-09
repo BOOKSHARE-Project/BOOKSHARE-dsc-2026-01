@@ -6,6 +6,9 @@ export class SeedService implements OnModuleInit {
   constructor(private readonly dataSource: DataSource) {}
 
   async onModuleInit() {
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
     // Seed para que as validações HTTP passem perfeitamente
     // Aguarda a sincronização do TypeORM
     setTimeout(async () => {
