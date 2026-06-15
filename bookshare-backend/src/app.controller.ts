@@ -17,4 +17,9 @@ export class AppController {
   async remove(@Param('id') id: string) {
     return this.loansService.remove(id);
   }
+
+  @Get('error-test/500')
+  trigger500() {
+    throw new Error('Banco de dados inacessível ou erro técnico interno.');
+  }
 }

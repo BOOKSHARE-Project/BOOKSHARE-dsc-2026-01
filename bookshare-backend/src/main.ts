@@ -2,9 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common'; // 1. Importe o ValidationPipe
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Registrar Filtro Global de Exceções
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   // 2. Configure o ValidationPipe Globalmente
   app.useGlobalPipes(
@@ -30,8 +34,9 @@ async function bootstrap() {
 
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);
-  console.log(`Swagger documentation is available on: http://localhost:${port}/api`);
+  console.log(
+    `Swagger documentation is available on: http://localhost:${port}/api`,
+  );
 }
 
-bootstrap();
-
+void bootstrap();

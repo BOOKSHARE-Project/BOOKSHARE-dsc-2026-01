@@ -20,11 +20,18 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserProfileResponseDto } from '../dto/user-profile-response.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { UserSelfGuard } from '../../auth/guards/user-self.guard';
+import { User } from '../entities/user.entity';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  private sanitizeUser(user: User): Omit<User, 'senha'> {
+    const sanitized: Omit<User, 'senha'> & { senha?: string } = { ...user };
+    delete sanitized.senha;
+    return sanitized;
+  }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -39,7 +46,8 @@ export class UsersController {
     description: 'Acesso não autorizado. Token JWT inválido ou ausente.',
   })
   async findAll() {
-    return this.usersService.findAll();
+    const users = await this.usersService.findAll();
+    return users.map((user) => this.sanitizeUser(user));
   }
 
   @Post()
@@ -57,7 +65,8 @@ export class UsersController {
     description: 'Conflito. E-mail já cadastrado no sistema.',
   })
   async create(@Body() dto: CreateUserDto) {
-    return this.usersService.create(dto);
+    const user = await this.usersService.create(dto);
+    return this.sanitizeUser(user);
   }
 
   @ApiBearerAuth()
@@ -78,7 +87,8 @@ export class UsersController {
   })
   @ApiResponse({
     status: 403,
-    description: 'Acesso proibido. Apenas o próprio usuário pode modificar seus dados.',
+    description:
+      'Acesso proibido. Apenas o próprio usuário pode modificar seus dados.',
   })
   @ApiResponse({
     status: 404,
@@ -89,7 +99,8 @@ export class UsersController {
     description: 'Conflito. O novo e-mail já está em uso por outro usuário.',
   })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+    const user = await this.usersService.update(id, updateUserDto);
+    return this.sanitizeUser(user);
   }
 
   @ApiBearerAuth()
@@ -106,7 +117,8 @@ export class UsersController {
   })
   @ApiResponse({
     status: 403,
-    description: 'Acesso proibido. Apenas o próprio usuário pode remover sua conta.',
+    description:
+      'Acesso proibido. Apenas o próprio usuário pode remover sua conta.',
   })
   @ApiResponse({
     status: 404,
@@ -130,14 +142,16 @@ export class UsersController {
   })
   @ApiResponse({
     status: 403,
-    description: 'Acesso proibido. Apenas o próprio usuário pode acessar seus dados.',
+    description:
+      'Acesso proibido. Apenas o próprio usuário pode acessar seus dados.',
   })
   @ApiResponse({
     status: 404,
     description: 'Usuário não encontrado.',
   })
   async findOne(@Param('id') id: string) {
-    return this.usersService.findById(id);
+    const user = await this.usersService.findById(id);
+    return this.sanitizeUser(user);
   }
 
   @ApiBearerAuth()
@@ -155,7 +169,8 @@ export class UsersController {
   })
   @ApiResponse({
     status: 403,
-    description: 'Acesso proibido. Apenas o próprio usuário pode acessar seu perfil.',
+    description:
+      'Acesso proibido. Apenas o próprio usuário pode acessar seu perfil.',
   })
   @ApiResponse({
     status: 404,
@@ -165,4 +180,3 @@ export class UsersController {
     return this.usersService.getProfile(id);
   }
 }
-

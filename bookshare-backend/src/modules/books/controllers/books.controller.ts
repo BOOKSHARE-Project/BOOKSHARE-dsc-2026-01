@@ -94,7 +94,8 @@ export class BooksController {
   })
   @ApiResponse({
     status: 403,
-    description: 'Acesso proibido. Apenas o dono do livro pode modificar seus dados.',
+    description:
+      'Acesso proibido. Apenas o dono do livro pode modificar seus dados.',
   })
   @ApiResponse({
     status: 404,
@@ -127,4 +128,3 @@ export class BooksController {
     return this.booksService.remove(id);
   }
 }
-

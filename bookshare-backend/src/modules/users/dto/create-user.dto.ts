@@ -8,7 +8,7 @@ export class CreateUserDto {
     required: true,
   })
   @IsNotEmpty({ message: 'O nome é obrigatório' })
-  @IsString()
+  @IsString({ message: 'O nome deve ser um texto' })
   nome!: string;
 
   @ApiProperty({
@@ -24,8 +24,7 @@ export class CreateUserDto {
     example: 'senhaSegura123',
     required: true,
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'A senha é obrigatória' })
   @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
   senha!: string;
 }
-

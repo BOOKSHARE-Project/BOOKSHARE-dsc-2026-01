@@ -38,4 +38,3 @@ export class CreateLoanResponseDto {
   })
   message!: string;
 }
-

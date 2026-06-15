@@ -81,7 +81,8 @@ export class LoansController {
   })
   @ApiResponse({
     status: 403,
-    description: 'Acesso proibido. Apenas o dono do livro solicitado pode aprovar o empréstimo.',
+    description:
+      'Acesso proibido. Apenas o dono do livro solicitado pode aprovar o empréstimo.',
   })
   @ApiResponse({
     status: 404,
@@ -107,7 +108,8 @@ export class LoansController {
   })
   @ApiResponse({
     status: 403,
-    description: 'Acesso proibido. Apenas o dono do livro pode registrar a devolução.',
+    description:
+      'Acesso proibido. Apenas o dono do livro pode registrar a devolução.',
   })
   @ApiResponse({
     status: 404,
@@ -142,4 +144,3 @@ export class LoansController {
     return this.loansService.update(id, updateLoanDto);
   }
 }
-

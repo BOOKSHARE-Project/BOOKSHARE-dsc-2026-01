@@ -33,7 +33,9 @@ describe('UsersService', () => {
     };
 
     const hashProviderMock: Partial<HashProvider> = {
-      hash: jest.fn().mockImplementation(async (val) => `hashed_${val}`),
+      hash: jest
+        .fn()
+        .mockImplementation((val) => Promise.resolve(`hashed_${val}`)),
       compare: jest.fn(),
     };
 
@@ -164,7 +166,14 @@ describe('UsersService', () => {
       existingUser.email = 'alice@example.com';
 
       const updateDto = { nome: 'Alice Cooper' };
-      const updatedUser = new User('user-123', 'Alice Cooper', 'alice@example.com', 'pass', 5.0, false);
+      const updatedUser = new User(
+        'user-123',
+        'Alice Cooper',
+        'alice@example.com',
+        'pass',
+        5.0,
+        false,
+      );
 
       repository.findById.mockResolvedValue(existingUser);
       repository.update.mockResolvedValue(updatedUser);
@@ -181,7 +190,14 @@ describe('UsersService', () => {
       existingUser.email = 'alice@example.com';
 
       const updateDto = { senha: 'newSecurePassword' };
-      const updatedUser = new User('user-123', 'Alice', 'alice@example.com', 'hashed_newSecurePassword', 5.0, false);
+      const updatedUser = new User(
+        'user-123',
+        'Alice',
+        'alice@example.com',
+        'hashed_newSecurePassword',
+        5.0,
+        false,
+      );
 
       repository.findById.mockResolvedValue(existingUser);
       repository.update.mockResolvedValue(updatedUser);
@@ -221,7 +237,14 @@ describe('UsersService', () => {
       existingUser.email = 'alice@example.com';
 
       const updateDto = { email: 'alice@example.com' };
-      const updatedUser = new User('user-123', 'Alice', 'alice@example.com', 'pass', 5.0, false);
+      const updatedUser = new User(
+        'user-123',
+        'Alice',
+        'alice@example.com',
+        'pass',
+        5.0,
+        false,
+      );
 
       repository.findById.mockResolvedValue(existingUser);
       repository.update.mockResolvedValue(updatedUser);

@@ -1,0 +1,105 @@
+### ====================================================================
+### BOOKSHARE API - TESTES MANUAIS DE TRATAMENTO DE ERROS E EXCEÇÕES
+### Use esta ferramenta com a extensão REST Client do VS Code
+### Com o servidor rodando (pnpm run start:dev), clique em "Send Request"
+### ====================================================================
+
+@baseUrl = http://localhost:3002
+@emailValido = manual.error.test@example.com
+@emailDuplicado = manual.error.test@example.com
+@senhaValida = Password123!
+
+### --------------------------------------------------------------------
+### 0. SETUP: Cadastrar Usuário para obter Token
+### --------------------------------------------------------------------
+# @name cadastro
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "nome": "Usuário Teste Erros",
+  "email": "{{emailValido}}",
+  "senha": "{{senhaValida}}"
+}
+
+###
+
+### 1. OBTER TOKEN DE ACESSO (LOGIN)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{emailValido}}",
+  "senha": "{{senhaValida}}"
+}
+
+### Salva o token de acesso obtido no login
+@accessToken = {{login.response.body.accessToken}}
+
+
+### ====================================================================
+### CENÁRIOS DE ERRO PROFISSIONAL
+### ====================================================================
+
+### CENÁRIO 1: NotFoundException (404)
+### Tenta buscar um livro que não existe no banco de dados.
+### Retorna status 404 padronizado com a mensagem "Livro não encontrado."
+GET {{baseUrl}}/books/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+###
+
+### CENÁRIO 2: ConflictException (409)
+### Tenta cadastrar um usuário com e-mail que já existe.
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "nome": "Usuário Duplicado",
+  "email": "{{emailDuplicado}}",
+  "senha": "{{senhaValida}}"
+}
+
+###
+
+### CENÁRIO 3: UnauthorizedException (401)
+### Tenta fazer login com senha incorreta.
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{emailValido}}",
+  "senha": "senha_incorreta_123"
+}
+
+###
+
+### CENÁRIO 4: ForbiddenException (403)
+### Tenta acessar o perfil de outro usuário (com ID diferente do token).
+GET {{baseUrl}}/users/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+###
+
+### CENÁRIO 5: BadRequestException / Erro de Validação (400)
+### Envia payload inválido com campos em branco ou e-mail malformado.
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "nome": "",
+  "email": "email-invalido",
+  "senha": ""
+}
+
+###
+
+### CENÁRIO 6: Remoção de Mensagens Internas / Erro Interno (500)
+### Acessa uma rota de teste que lança um erro técnico bruto do JavaScript.
+### O filtro de exceções deve capturar, logar o erro detalhado internamente no terminal,
+### e responder ao cliente apenas com o erro 500 limpo: "Erro interno do servidor".
+GET {{baseUrl}}/error-test/500
+Content-Type: application/json

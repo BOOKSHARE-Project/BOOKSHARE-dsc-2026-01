@@ -13,16 +13,16 @@ export class BooksTypeOrmRepository implements BooksRepository {
     private readonly typeOrmRepo: Repository<BookEntity>,
   ) {}
 
-  async create(bookData: any): Promise<any> {
+  async create(bookData: Partial<BookEntity>): Promise<BookEntity> {
     const createdBook = this.typeOrmRepo.create(bookData);
     return await this.typeOrmRepo.save(createdBook);
   }
 
-  async findById(id: string): Promise<any | null> {
+  async findById(id: string): Promise<BookEntity | null> {
     return await this.typeOrmRepo.findOne({ where: { id } });
   }
 
-  async findAll(): Promise<any[]> {
+  async findAll(): Promise<BookEntity[]> {
     return await this.typeOrmRepo.find();
   }
 

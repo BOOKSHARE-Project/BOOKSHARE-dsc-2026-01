@@ -1,0 +1,160 @@
+﻿
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\main.ts
+  38:1  warning  Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\auth\controllers\auth.controller.spec.ts
+  49:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  64:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\auth\decorators\current-user.decorator.ts
+  5:11  error  Unsafe assignment of an `any` value           @typescript-eslint/no-unsafe-assignment
+  6:5   error  Unsafe return of a value of type `any`        @typescript-eslint/no-unsafe-return
+  6:20  error  Unsafe member access .user on an `any` value  @typescript-eslint/no-unsafe-member-access
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\auth\dto\login.dto.ts
+  1:41  error  'MinLength' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\auth\guards\book-owner.guard.spec.ts
+  14:5   error    Unsafe assignment of an `any` value                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unsafe-assignment
+  29:44  warning  Unsafe argument of type `any` assigned to a parameter of type `Book | Promise<Book>`                                                                                                                                                                                                                                                        @typescript-eslint/no-unsafe-argument
+  48:12  error    A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  56:44  warning  Unsafe argument of type `any` assigned to a parameter of type `Book | Promise<Book>`                                                                                                                                                                                                                                                        @typescript-eslint/no-unsafe-argument
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\auth\guards\jwt-auth.guard.spec.ts
+  10:5   error  Unsafe assignment of an `any` value                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unsafe-assignment
+  45:12  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  46:7   error  Unsafe assignment of an `any` value                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unsafe-assignment
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\auth\guards\jwt-auth.guard.ts
+  14:11  error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
+  15:11  error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
+  15:32  error    Unsafe member access .headers on an `any` value                         @typescript-eslint/no-unsafe-member-access
+  21:11  error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
+  21:27  error    Unsafe call of an `any` typed value                                     @typescript-eslint/no-unsafe-call
+  21:38  error    Unsafe member access .split on an `any` value                           @typescript-eslint/no-unsafe-member-access
+  23:40  error    Unsafe call of an `any` typed value                                     @typescript-eslint/no-unsafe-call
+  23:46  error    Unsafe member access .trim on an `any` value                            @typescript-eslint/no-unsafe-member-access
+  28:13  error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
+  28:57  warning  Unsafe argument of type `any` assigned to a parameter of type `string`  @typescript-eslint/no-unsafe-argument
+  31:7   error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
+  31:15  error    Unsafe member access .user on an `any` value                            @typescript-eslint/no-unsafe-member-access
+  33:14  error    'error' is defined but never used                                       @typescript-eslint/no-unused-vars
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\auth\guards\loan-book-owner.guard.spec.ts
+   16:5   error    Unsafe assignment of an `any` value                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unsafe-assignment
+   19:5   error    Unsafe assignment of an `any` value                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unsafe-assignment
+   39:48  warning  Unsafe argument of type `any` assigned to a parameter of type `LoanEntity | Promise<LoanEntity>`                                                                                                                                                                                                                                            @typescript-eslint/no-unsafe-argument
+   40:48  warning  Unsafe argument of type `any` assigned to a parameter of type `BookEntity | Promise<BookEntity>`                                                                                                                                                                                                                                            @typescript-eslint/no-unsafe-argument
+   59:12  error    A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+   60:12  error    A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+   73:48  warning  Unsafe argument of type `any` assigned to a parameter of type `LoanEntity | Promise<LoanEntity>`                                                                                                                                                                                                                                            @typescript-eslint/no-unsafe-argument
+   74:48  warning  Unsafe argument of type `any` assigned to a parameter of type `BookEntity | Promise<BookEntity>`                                                                                                                                                                                                                                            @typescript-eslint/no-unsafe-argument
+  124:48  warning  Unsafe argument of type `any` assigned to a parameter of type `LoanEntity | Promise<LoanEntity>`                                                                                                                                                                                                                                            @typescript-eslint/no-unsafe-argument
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\auth\services\auth.service.spec.ts
+  83:13  error  Unsafe assignment of an `any` value  @typescript-eslint/no-unsafe-assignment
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\books\controllers\books.controller.spec.ts
+  41:13  error    Unsafe assignment of an `any` value                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unsafe-assignment
+  42:40  warning  Unsafe argument of type `any` assigned to a parameter of type `Book | Promise<Book>`                                                                                                                                                                                                                                                        @typescript-eslint/no-unsafe-argument
+  44:14  error    A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  60:9   error    A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  68:9   error    A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\books\dto\create-book.dto.ts
+  1:32  error  'IsISBN' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\books\repositories\books-typeorm.repository.ts
+  17:49  warning  Unsafe argument of type `any` assigned to a parameter of type `DeepPartial<BookEntity>[]`  @typescript-eslint/no-unsafe-argument
+  21:39  error    'any' overrides all other types in this union type                                         @typescript-eslint/no-redundant-type-constituents
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\books\services\books.service.spec.ts
+   63:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  122:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  123:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  138:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\loans\repositories\loans-typeorm.repository.ts
+  17:20  error    'id' is defined but never used                                                                       @typescript-eslint/no-unused-vars
+  48:39  warning  Unsafe argument of type `any` assigned to a parameter of type `_QueryDeepPartialEntity<LoanEntity>`  @typescript-eslint/no-unsafe-argument
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\loans\services\loans.service.spec.ts
+   92:11  error    Unsafe assignment of an `any` value                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unsafe-assignment
+  116:60  warning  Unsafe argument of type `any` assigned to a parameter of type `UserEntity | Promise<UserEntity>`                                                                                                                                                                                                                                            @typescript-eslint/no-unsafe-argument
+  125:14  error    A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  162:11  error    Unsafe assignment of an `any` value                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unsafe-assignment
+  168:11  error    Unsafe assignment of an `any` value                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unsafe-assignment
+  175:44  warning  Unsafe argument of type `any` assigned to a parameter of type `LoanEntity | Promise<LoanEntity>`                                                                                                                                                                                                                                            @typescript-eslint/no-unsafe-argument
+  176:44  warning  Unsafe argument of type `any` assigned to a parameter of type `BookEntity | Promise<BookEntity>`                                                                                                                                                                                                                                            @typescript-eslint/no-unsafe-argument
+  177:42  warning  Unsafe argument of type `any` assigned to a parameter of type `Loan | Promise<Loan>`                                                                                                                                                                                                                                                        @typescript-eslint/no-unsafe-argument
+  191:14  error    A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  195:11  error    Unsafe assignment of an `any` value                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unsafe-assignment
+  208:44  warning  Unsafe argument of type `any` assigned to a parameter of type `LoanEntity | Promise<LoanEntity>`                                                                                                                                                                                                                                            @typescript-eslint/no-unsafe-argument
+  218:44  warning  Unsafe argument of type `any` assigned to a parameter of type `BookEntity | Promise<BookEntity>`                                                                                                                                                                                                                                            @typescript-eslint/no-unsafe-argument
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\loans\services\loans.service.ts
+  207:48  warning  Unsafe argument of type `any` assigned to a parameter of type `UpdateLoanDto`  @typescript-eslint/no-unsafe-argument
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\modules\users\services\users.service.spec.ts
+   36:54  error  Async arrow function has no 'await' expression                                                                                                                                                                                                                                                                                              @typescript-eslint/require-await
+   84:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+   85:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  154:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  181:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  205:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  206:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  251:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+  273:14  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+
+C:\Users\GABRIEL VIEIRA\Desktop\BOOKSHARE-dsc-2026-01\bookshare-backend\src\seed.service.ts
+   8:3   error  Async method 'onModuleInit' has no 'await' expression                   @typescript-eslint/require-await
+  14:16  error  Promise returned in function argument where a void return was expected  @typescript-eslint/no-misused-promises
+
+Ô£û 75 problems (56 errors, 19 warnings)
+

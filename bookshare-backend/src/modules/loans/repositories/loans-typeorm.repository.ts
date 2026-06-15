@@ -1,5 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { LoansRepository } from './loans.repository.interface';
 import { Loan, LoanEntity } from '../entities/loan.entity';
 import { LoanStatus } from '../../../common/enums/loan-status.enum';
@@ -14,6 +15,7 @@ export class LoansTypeOrmRepository implements LoansRepository {
     private readonly typeOrmRepo: Repository<LoanEntity>,
     private readonly dataSource: DataSource,
   ) {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   findByIdWithBook(id: string): Promise<LoanEntity | null> {
     throw new Error('Method not implemented.');
   }
@@ -45,7 +47,10 @@ export class LoansTypeOrmRepository implements LoansRepository {
   }
 
   async update(id: string, data: UpdateLoanDto): Promise<Loan> {
-    await this.typeOrmRepo.update(id, data as any);
+    await this.typeOrmRepo.update(
+      id,
+      data as QueryDeepPartialEntity<LoanEntity>,
+    );
     return this.typeOrmRepo.findOne({ where: { id: id } });
   }
 

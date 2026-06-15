@@ -1,6 +1,6 @@
 import { PartialType, ApiProperty } from '@nestjs/swagger';
 import { CreateLoanDto } from './create-loan.dto';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsDate } from 'class-validator';
 
 export class UpdateLoanDto extends PartialType(CreateLoanDto) {
   @ApiProperty({
@@ -9,7 +9,10 @@ export class UpdateLoanDto extends PartialType(CreateLoanDto) {
     required: false,
   })
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'O status deve ser uma string' })
   status?: string;
-}
 
+  @IsOptional()
+  @IsDate({ message: 'A data de retorno prevista deve ser uma data válida' })
+  dataRetornoPrevista?: Date;
+}

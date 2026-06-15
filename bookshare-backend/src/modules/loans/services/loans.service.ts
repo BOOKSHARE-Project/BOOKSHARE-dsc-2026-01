@@ -204,10 +204,11 @@ export class LoansService {
 
     // 4. Transicionar status do empréstimo para ATIVO e definir a data de retorno prevista (7 dias a partir de hoje)
     const dataRetornoPrevista = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    await this.loansRepository.update(loan.id, {
+    const updateDto: UpdateLoanDto = {
       status: LoanStatus.ATIVO,
       dataRetornoPrevista,
-    } as any);
+    };
+    await this.loansRepository.update(loan.id, updateDto);
 
     return {
       loanId: loan.id,

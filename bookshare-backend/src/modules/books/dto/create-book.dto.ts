@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsISBN } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBookDto {
@@ -8,7 +8,7 @@ export class CreateBookDto {
     required: true,
   })
   @IsNotEmpty({ message: 'O título é obrigatório.' })
-  @IsString()
+  @IsString({ message: 'O título deve ser um texto.' })
   titulo!: string;
 
   @ApiProperty({
@@ -17,7 +17,7 @@ export class CreateBookDto {
     required: true,
   })
   @IsNotEmpty({ message: 'O autor é obrigatório.' })
-  @IsString()
+  @IsString({ message: 'O autor deve ser um texto.' })
   autor!: string;
 
   @ApiProperty({
@@ -35,7 +35,6 @@ export class CreateBookDto {
     required: true,
   })
   @IsNotEmpty({ message: 'O ID do dono é obrigatório.' })
-  @IsString()
+  @IsString({ message: 'O ID do dono deve ser um texto.' })
   donoId!: string;
 }
-

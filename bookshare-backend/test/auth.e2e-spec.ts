@@ -1,13 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
-import { AppModule } from 'src/app.module';
+import { AppModule } from '../src/app.module';
 
 describe('Auth (e2e)', () => {
   let app: INestApplication;
   let accessToken: string;
 
-  // Geramos um e-mail único por execução para garantir a idempotência dos testes
   const uniqueEmail = `e2e.auth.${Date.now()}.${Math.floor(Math.random() * 10000)}@example.com`;
   const defaultPassword = 'password123';
   const defaultName = 'Teste E2E User';

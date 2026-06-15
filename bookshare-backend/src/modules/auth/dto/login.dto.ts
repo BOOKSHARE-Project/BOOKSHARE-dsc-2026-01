@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginDto {
@@ -16,7 +16,6 @@ export class LoginDto {
     required: true,
   })
   @IsNotEmpty({ message: 'A senha é obrigatória' })
-  @IsString()
+  @IsString({ message: 'A senha deve ser um texto' })
   senha!: string;
 }
-

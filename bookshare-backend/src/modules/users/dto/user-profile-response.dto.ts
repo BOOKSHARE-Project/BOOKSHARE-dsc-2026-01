@@ -50,4 +50,3 @@ export class UserProfileResponseDto {
   })
   statusMultas: string;
 }
-

@@ -26,12 +26,12 @@ export default async (): Promise<void> => {
     port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5433,
     user: process.env.DB_USER || 'mrn',
     password: process.env.DB_PASSWORD || 'Ping2012',
-    database: 'postgres', // Connect to default postgres DB
+    database: 'postgres',
   });
 
   try {
     await client.connect();
-    
+
     const dbName = process.env.DB_DATABASE || 'bookshare_test_db';
     const res = await client.query(
       `SELECT 1 FROM pg_database WHERE datname = $1`,
