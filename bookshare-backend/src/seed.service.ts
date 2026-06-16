@@ -6,7 +6,8 @@ export class SeedService implements OnModuleInit {
   constructor(private readonly dataSource: DataSource) {}
 
   onModuleInit() {
-    if (process.env.NODE_ENV === 'test') {
+    if (process.env.NODE_ENV === 'test' || process.env.DISABLE_SEED === 'true') {
+      console.log('🔇 Seed automático desabilitado.');
       return;
     }
     // Seed para que as validações HTTP passem perfeitamente

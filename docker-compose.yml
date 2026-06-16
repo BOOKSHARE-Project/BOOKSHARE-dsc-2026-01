@@ -1,0 +1,81 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: bookshare-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: mrn
+      POSTGRES_PASSWORD: Ping2012
+      POSTGRES_DB: bookshare_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - bookshare_pg_data:/var/lib/postgresql/data
+    networks:
+      - bookshare_network
+
+  app:
+    build:
+      context: ./bookshare-backend
+      dockerfile: Dockerfile
+    container_name: bookshare-app
+    restart: always
+    command: pnpm run start:dev
+    ports:
+      - "3002:3002"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=mrn
+      - DB_PASSWORD=Ping2012
+      - DB_DATABASE=bookshare_db
+      - PORT=3002
+      - DISABLE_SEED=true
+    depends_on:
+      - db
+    networks:
+      - bookshare_network
+    develop:
+      watch:
+        - action: sync
+          path: ./bookshare-backend
+          target: /usr/src/app
+          ignore:
+            - node_modules
+            - dist
+        - action: rebuild
+          path: ./bookshare-backend/package.json
+        - action: rebuild
+          path: ./bookshare-backend/pnpm-lock.yaml
+
+  web:
+    build:
+      context: ./bookshare-frontend
+      dockerfile: Dockerfile
+    container_name: bookshare-web
+    restart: always
+    ports:
+      - "5173:5173"
+    depends_on:
+      - app
+    networks:
+      - bookshare_network
+    develop:
+      watch:
+        - action: sync
+          path: ./bookshare-frontend
+          target: /usr/src/app
+          ignore:
+            - node_modules
+            - dist
+        - action: rebuild
+          path: ./bookshare-frontend/package.json
+        - action: rebuild
+          path: ./bookshare-frontend/pnpm-lock.yaml
+
+volumes:
+  bookshare_pg_data:
+
+networks:
+  bookshare_network:
+    driver: bridge

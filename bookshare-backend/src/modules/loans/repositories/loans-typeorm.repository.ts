@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { QueryDeepPartialEntity } from 'typeorm';
 import { LoansRepository } from './loans.repository.interface';
 import { Loan, LoanEntity } from '../entities/loan.entity';
 import { LoanStatus } from '../../../common/enums/loan-status.enum';

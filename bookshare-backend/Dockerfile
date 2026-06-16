@@ -2,20 +2,23 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-# Copia arquivos de dependência
-COPY package*.json ./
+# Instala o pnpm globalmente no container
+RUN npm install -g pnpm
 
-# Instala todas as dependências
-RUN npm install --legacy-peer-deps
+# Copia arquivos de dependência
+COPY package.json pnpm-lock.yaml* ./
+
+# Instala todas as dependências usando pnpm
+RUN pnpm install
 
 # Copia o restante dos arquivos do projeto
 COPY . .
 
 # Compila o projeto NestJS
-RUN npm run build
+RUN pnpm run build
 
 # Expõe a porta usada pela aplicação (3002)
 EXPOSE 3002
 
 # Comando para rodar a aplicação em produção
-CMD ["npm", "run", "start:prod"]
+CMD ["pnpm", "run", "start:prod"]

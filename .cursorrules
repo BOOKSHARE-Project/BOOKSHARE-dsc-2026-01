@@ -1,0 +1,5 @@
+# Project Rules & Guidelines
+
+- **Package Manager / Gerenciador de Pacotes**:
+  - Always use `pnpm` for any package installations, script execution, or dependency updates. Do not use `npm` or `yarn` unless explicitly requested.
+  - Sempre utilize o `pnpm` para qualquer instalação de pacotes, execução de scripts ou atualização de dependências neste projeto. Não utilize `npm` ou `yarn` a menos que explicitamente solicitado pelo usuário.
